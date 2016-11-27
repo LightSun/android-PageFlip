@@ -9,6 +9,7 @@
           <set>
             <option value="/Volumes/Data/github/android-PageFlip" />
             <option value="/Volumes/Data/github/android-PageFlip/PageFlip" />
+            <option value="/Volumes/Data/github/android-PageFlip/PageFlip-JNI" />
             <option value="/Volumes/Data/github/android-PageFlip/Sample" />
           </set>
         </option>
