@@ -49,3 +49,4 @@ captures/
 .DS_Store
 /build
 /captures
+.externalNativeBuild

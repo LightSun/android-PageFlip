@@ -1,3 +1,0 @@
-/Volumes/Data/github/android-PageFlip/PageFlip-JNI/.externalNativeBuild/cmake/debug/armeabi/CMakeFiles/edit_cache.dir
-/Volumes/Data/github/android-PageFlip/PageFlip-JNI/.externalNativeBuild/cmake/debug/armeabi/CMakeFiles/rebuild_cache.dir
-/Volumes/Data/github/android-PageFlip/PageFlip-JNI/.externalNativeBuild/cmake/debug/armeabi/CMakeFiles/pageflip-lib.dir
