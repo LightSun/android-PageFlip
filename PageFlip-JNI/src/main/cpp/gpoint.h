@@ -1,8 +1,0 @@
-//
-// Created by Chao Zhang on 28/11/2016.
-//
-
-#ifndef ANDROID_PAGEFLIP_GPOINT_H
-#define ANDROID_PAGEFLIP_GPOINT_H
-
-#endif //ANDROID_PAGEFLIP_GPOINT_H
