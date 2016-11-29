@@ -22,7 +22,8 @@ add_library( # Sets the name of the library.
              src/main/cpp/GLViewRect.cpp
              src/main/cpp/GLProgram.cpp
              src/main/cpp/GLShader.cpp
-             src/main/cpp/Error.h)
+             src/main/cpp/VertexProgram.cpp
+             src/main/cpp/Matrix.cpp)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because system libraries are included in the search path by

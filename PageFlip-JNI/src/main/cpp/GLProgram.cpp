@@ -74,7 +74,7 @@ int GLProgram::init(const char *shader, const char *fragment)
     }
 
     glAttachShader(hProgram, mShader->getHandle());
-    error = checkGlError("attach shader(glAttachShader)");
+    error = checkGlError("When attach shader(glAttachShader)");
     if (error != Error::OK)
     {
         clean();
@@ -82,11 +82,11 @@ int GLProgram::init(const char *shader, const char *fragment)
     }
 
     glAttachShader(hProgram, mFragment->getHandle());
-    error = checkGlError("attach fragment(glAttachShader");
+    error = checkGlError("When attach fragment(glAttachShader");
     if (error != Error::OK)
     {
         clean();
-        return Error::ERR_GL_ATTACH_FRAGEMENT;
+        return Error::ERR_GL_ATTACH_FRAGMENT;
     }
 
     glLinkProgram(hProgram);
@@ -113,7 +113,7 @@ int GLProgram::checkGlError(const char* desc)
 {
     GLenum err;
     while ((err = glGetError()) != GL_NO_ERROR) {
-        sprintf(Error::desc, "After %s, glGetError() return 0x%x", desc, err);
+        sprintf(Error::desc, "%s, glGetError() return 0x%x", desc, err);
         return Error::ERROR;
     }
 
