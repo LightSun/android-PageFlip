@@ -24,7 +24,7 @@ using namespace std;
 
 GLProgram::GLProgram()
 {
-    hProgram = Constant::INVALID_HANDLE;
+    hProgram = Constant::GL_INVALID_HANDLE;
     mShader = new GLShader();
     mFragment = new GLShader();
 }
@@ -39,10 +39,10 @@ void GLProgram::clean()
     mShader->clean();
     mFragment->clean();
 
-    if (hProgram != Constant::INVALID_HANDLE)
+    if (hProgram != Constant::GL_INVALID_HANDLE)
     {
         glDeleteProgram(hProgram);
-        hProgram = Constant::INVALID_HANDLE;
+        hProgram = Constant::GL_INVALID_HANDLE;
     }
 }
 
@@ -66,7 +66,7 @@ int GLProgram::init(const char *shader, const char *fragment)
     }
 
     hProgram = glCreateProgram();
-    if (hProgram == Constant::INVALID_HANDLE)
+    if (hProgram == Constant::GL_INVALID_HANDLE)
     {
         mShader->clean();
         mFragment->clean();

@@ -29,7 +29,7 @@ static const auto gVertexShader =
         "    v_texCoord = a_texCoord;\n"
         "}";
 
-static const auto gVertexFragment =
+static const auto gFragmentShader =
         "uniform sampler2D u_texture;\n"
         "varying vec2 v_texCoord;\n"
         "\n"
@@ -38,10 +38,10 @@ static const auto gVertexFragment =
         "}";
 
 VertexProgram::VertexProgram()
-        : hMVPMatrix(Constant::INVALID_HANDLE),
-          hVertexPostion(Constant::INVALID_HANDLE),
-          hTextureCoord(Constant::INVALID_HANDLE),
-          hTexture(Constant::INVALID_HANDLE)
+        : hMVPMatrix(Constant::GL_INVALID_LOCATION),
+          hVertexPostion(Constant::GL_INVALID_LOCATION),
+          hTextureCoord(Constant::GL_INVALID_LOCATION),
+          hTexture(Constant::GL_INVALID_LOCATION)
 {
 }
 
@@ -52,17 +52,17 @@ VertexProgram::~VertexProgram()
 
 void VertexProgram::clean()
 {
-    GLProgram::clean();
+    hTexture = Constant::GL_INVALID_LOCATION;
+    hMVPMatrix = Constant::GL_INVALID_LOCATION;
+    hTextureCoord = Constant::GL_INVALID_LOCATION;
+    hVertexPostion = Constant::GL_INVALID_LOCATION;
 
-    hTexture = Constant::INVALID_HANDLE;
-    hMVPMatrix = Constant::INVALID_HANDLE;
-    hTextureCoord = Constant::INVALID_HANDLE;
-    hVertexPostion = Constant::INVALID_HANDLE;
+    GLProgram::clean();
 }
 
 int VertexProgram::init()
 {
-    return GLProgram::init(gVertexShader, gVertexFragment);
+    return GLProgram::init(gVertexShader, gFragmentShader);
 }
 
 void VertexProgram::initMatrix(float left, float right, float bottom, float top)
@@ -73,4 +73,12 @@ void VertexProgram::initMatrix(float left, float right, float bottom, float top)
     Matrix::setLookAtM(MVMatrix, 0, 0, 3000, 0, 0, 0, 0, 1, 0);
     Matrix::setIdentityM(MVPMatrix);
     Matrix::multiplyMM(MVPMatrix, projectMatrix, MVMatrix);
+}
+
+void VertexProgram::getVarsLocation()
+{
+    hTexture = glGetUniformLocation(hProgram, VAR_TEXTURE);
+    hMVPMatrix = glGetUniformLocation(hProgram, VAR_MVP_MATRIX);
+    hTextureCoord = glGetAttribLocation(hProgram, VAR_TEXTURE_COORD);
+    hVertexPostion = glGetAttribLocation(hProgram, VAR_VERTEX_POS);
 }

@@ -24,9 +24,10 @@ private:
     static const int _ERR_GL = 1000;
 
 public:
-    static const int OK = 0;
-    static const int ERROR = 1;
-    static const int ERR_NULL_PARAMETER = _ERROR + 0;
+    static const int OK     = 0;
+    static const int ERROR  = 1;
+    static const int ERR_NULL_PARAMETER             = _ERROR + 0;
+    static const int ERR_INVALID_PARAMETER          = _ERROR + 1;
 
     static const int ERR_GL_COMPILE_SHADER          = _ERR_GL + 0;
     static const int ERR_GL_LINK_PROGRAM            = _ERR_GL + 1;

@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-#ifndef ANDROID_PAGEFLIP_CONSTANT_H
-#define ANDROID_PAGEFLIP_CONSTANT_H
+#ifndef ANDROID_PAGEFLIP_SHADOWCOLOR_H
+#define ANDROID_PAGEFLIP_SHADOWCOLOR_H
 
-class Constant
+class ShadowColor
 {
-public:
-    static const int GL_INVALID_HANDLE = 0;
-    static const int GL_INVALID_LOCATION = -1;
-};
+protected:
 
-#endif //ANDROID_PAGEFLIP_CONSTANT_H
+};
+#endif //ANDROID_PAGEFLIP_SHADOWCOLOR_H

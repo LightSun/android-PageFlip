@@ -30,10 +30,10 @@ protected:
 
 public:
     GLProgram();
-    ~GLProgram();
+    virtual ~GLProgram();
 
     int init(const char* shader, const char* fragment);
-    void clean();
+    virtual void clean();
 
     // inline
     inline int getProgram()

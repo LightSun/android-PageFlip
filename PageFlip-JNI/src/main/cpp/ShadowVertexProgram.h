@@ -14,42 +14,33 @@
  * limitations under the License.
  */
 
-#ifndef ANDROID_PAGEFLIP_VERTEXPROGRAM_H
-#define ANDROID_PAGEFLIP_VERTEXPROGRAM_H
+#ifndef ANDROID_PAGEFLIP_SHADOWVERTEXPROGRAM_H
+#define ANDROID_PAGEFLIP_SHADOWVERTEXPROGRAM_H
 
 
 #include "GLProgram.h"
 
-class VertexProgram : public GLProgram
+class ShadowVertexProgram : public GLProgram
 {
-public:
-    static float MVMatrix[16];
-    static float MVPMatrix[16];
 
 protected:
-    static const char *VAR_MVP_MATRIX       = "u_MVPMatrix";
-    static const char *VAR_VERTEX_POS       = "a_vexPosition";
-    static const char *VAR_TEXTURE_COORD    = "a_texCoord";
-    static const char *VAR_TEXTURE          = "u_texture";
+    static const char *VAR_MVP_MATRIX   = "u_MVPMatrix";
+    static const char *VAR_VERTEX_Z     = "u_vexZ";
+    static const char *VAR_VERTEX_POS   = "a_vexPosition";
 
     GLint hMVPMatrix;
-    GLint hVertexPostion;
-    GLint hTextureCoord;
-    GLint hTexture;
+    GLint hVertexZ;
+    GLint hVertexPosition;
 
 public:
-    VertexProgram();
-    ~VertexProgram();
+    ShadowVertexProgram();
+    ~ShadowVertexProgram();
 
-    void clean();
     int init();
-    void initMatrix(float left,
-                    float right,
-                    float bottom,
-                    float top);
+    void clean();
 
 protected:
     void getVarsLocation();
 };
 
-#endif //ANDROID_PAGEFLIP_VERTEXPROGRAM_H
+#endif //ANDROID_PAGEFLIP_SHADOWVERTEXPROGRAM_H

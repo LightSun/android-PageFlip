@@ -19,7 +19,7 @@
 #include "Error.h"
 
 GLShader::GLShader()
-        : hShader(Constant::INVALID_HANDLE)
+        : hShader(Constant::GL_INVALID_HANDLE)
 
 {
 }
@@ -34,7 +34,7 @@ int GLShader::load(GLenum type, const char *shader)
     clean();
 
     hShader = glCreateShader(type);
-    if (hShader == Constant::INVALID_HANDLE)
+    if (hShader == Constant::GL_INVALID_HANDLE)
     {
         return Error::ERR_GL_CREATE_SHADER_HANDLE;
     }
@@ -54,7 +54,7 @@ int GLShader::load(GLenum type, const char *shader)
             infoLen = Error::checkDescLenth(infoLen);
             glGetShaderInfoLog(hShader, infoLen, NULL, Error::desc);
             glDeleteShader(hShader);
-            hShader = Constant::INVALID_HANDLE;
+            hShader = Constant::GL_INVALID_HANDLE;
         }
 
         return Error::ERR_GL_COMPILE_SHADER;
@@ -65,7 +65,7 @@ int GLShader::load(GLenum type, const char *shader)
 
 void GLShader::clean()
 {
-    if (hShader != Constant::INVALID_HANDLE) {
+    if (hShader != Constant::GL_INVALID_HANDLE) {
         glDeleteShader(hShader);
         hShader = 0;
     }

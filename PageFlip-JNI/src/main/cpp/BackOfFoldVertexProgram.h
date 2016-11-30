@@ -14,14 +14,32 @@
  * limitations under the License.
  */
 
-#ifndef ANDROID_PAGEFLIP_CONSTANT_H
-#define ANDROID_PAGEFLIP_CONSTANT_H
+#ifndef ANDROID_PAGEFLIP_BACKOFFOLDVERTEXPROGRAM_H
+#define ANDROID_PAGEFLIP_BACKOFFOLDVERTEXPROGRAM_H
 
-class Constant
+
+#include "GLProgram.h"
+
+class BackOfFoldVertexProgram : public GLProgram
 {
+protected:
+    static const char *VAR_TEXTURE_OFFSET   = "u_texXOffset";
+    static const char *VAR_MASK_COLOR       = "u_maskColor";
+    static const char *VAR_SHADOW_TEXTURE   = "u_shadow";
+
+    GLint hShadow;
+    GLint hMaskColor;
+    GLint hTexXOffset;
+
 public:
-    static const int GL_INVALID_HANDLE = 0;
-    static const int GL_INVALID_LOCATION = -1;
+    BackOfFoldVertexProgram();
+    ~BackOfFoldVertexProgram();
+
+    void clean();
+    int init();
+
+protected:
+    void getVarsLocation();
 };
 
-#endif //ANDROID_PAGEFLIP_CONSTANT_H
+#endif //ANDROID_PAGEFLIP_BACKOFFOLDVERTEXPROGRAM_H
