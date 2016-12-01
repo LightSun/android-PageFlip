@@ -15,6 +15,118 @@
  */
 
 #include "Vertexes.h"
+#include "Error.h"
+
+Vertexes::Vertexes()
+        : mNext(0),
+          mCapacity(0),
+          mSizeOfPerVex(0),
+          mVertexes(NULL),
+          mTexCoords(NULL)
+{
+}
+
+Vertexes::Vertexes(int capacity, int sizeOfPerVex, bool hasTexture)
+{
+    set(capacity, sizeOfPerVex, hasTexture);
+}
+
+Vertexes::~Vertexes()
+{
+    release();
+}
+
+void Vertexes::release()
+{
+    if (mVertexes)
+    {
+        delete mVertexes[mCapacity * mSizeOfPerVex];
+    }
+
+    if (mTexCoords)
+    {
+        delete mTexCoords[mCapacity << 1];
+    }
+
+    mNext = 0;
+    mCapacity = 0;
+    mSizeOfPerVex = 0;
+}
+
+int Vertexes::set(int capacity, int sizeOfPerVex, bool hasTexture)
+{
+    if (sizeOfPerVex < 2)
+    {
+        return Error::ERR_INVALID_PARAMETER;
+    }
+
+    release();
+    mCapacity = capacity;
+    mSizeOfPerVex = sizeOfPerVex;
+    mVertexes = new float[capacity * sizeOfPerVex];
+
+    if (hasTexture)
+    {
+        mTexCoords = new float[capacity << 1];
+    }
+    return Error::OK;
+}
+
+Vertexes& Vertexes::addVertex(float x, float y, float z)
+{
+    mVertexes[mNext++] = x;
+    mVertexes[mNext++] = y;
+    mVertexes[mNext++] = z;
+    return *this;
+}
+
+Vertexes& Vertexes::addVertex(float x, float y, float z,
+                              float tx, float ty)
+{
+    int j = mNext / mSizeOfPerVex * 2;
+    mVertexes[mNext++] = x;
+    mVertexes[mNext++] = y;
+    mVertexes[mNext++] = z;
+
+    mTexCoords[j++] = tx;
+    mTexCoords[j] = ty;
+    return *this;
+}
+
+Vertexes& Vertexes::addVertex(float x, float y, float z, float w)
+{
+    mVertexes[mNext++] = x;
+    mVertexes[mNext++] = y;
+    mVertexes[mNext++] = z;
+    mVertexes[mNext++] = w;
+    return *this;
+}
+
+Vertexes& Vertexes::addVertex(float x, float y, float z, float w,
+                              float tx, float ty)
+{
+    int j = mNext / mSizeOfPerVex * 2;
+    mVertexes[mNext++] = x;
+    mVertexes[mNext++] = y;
+    mVertexes[mNext++] = z;
+    mVertexes[mNext++] = w;
+
+    mTexCoords[j++] = tx;
+    mTexCoords[j] = ty;
+    return *this;
+}
+
+Vertexes& Vertexes::addVertex(GLPoint &p)
+{
+    int j = mNext / mSizeOfPerVex * 2;
+    mVertexes[mNext++] = p.x;
+    mVertexes[mNext++] = p.y;
+    mVertexes[mNext++] = p.z;
+
+    mTexCoords[j++] = p.tX;
+    mTexCoords[j] = p.tY;
+    return *this;
+}
 
 void Vertexes::drawWith(GLenum type, GLint hVertexPos, GLint hTexCoord)
 {

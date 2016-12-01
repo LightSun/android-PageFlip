@@ -17,9 +17,34 @@
 #ifndef ANDROID_PAGEFLIP_SHADOWCOLOR_H
 #define ANDROID_PAGEFLIP_SHADOWCOLOR_H
 
+#include "Error.h"
+
 class ShadowColor
 {
-protected:
+public:
+    float startColor;
+    float startAlpha;
+    float endColor;
+    float endAlpha;
 
+    ShadowColor() : startColor(0), startAlpha(0), endColor(0), endAlpha(0)
+    { }
+
+    inline int set(float startColor, float startAlpha,
+                   float endColor, float endAlpha)
+    {
+        if (startColor < 0 || startColor > 1 ||
+            startAlpha < 0 || startAlpha > 1 ||
+            endColor < 0 || endColor > 1 ||
+            endAlpha < 0 || endAlpha > 1) {
+            return Error::ERR_INVALID_PARAMETER;
+        }
+
+        this->startColor = startColor;
+        this->startAlpha = startAlpha;
+        this->endColor = endColor;
+        this->endAlpha = endAlpha;
+        return Error::OK;
+    }
 };
 #endif //ANDROID_PAGEFLIP_SHADOWCOLOR_H

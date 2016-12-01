@@ -33,7 +33,7 @@ protected:
     static const char *VAR_TEXTURE          = "u_texture";
 
     GLint hMVPMatrix;
-    GLint hVertexPostion;
+    GLint hVertexPosition;
     GLint hTextureCoord;
     GLint hTexture;
 
@@ -47,6 +47,27 @@ public:
                     float right,
                     float bottom,
                     float top);
+
+    // inline
+    inline GLint getMVPMatrixLoc()
+    {
+        return hMVPMatrix;
+    }
+
+    inline GLint getVertexPositionLoc()
+    {
+        return hVertexPosition;
+    }
+
+    inline GLint getTexCoordLoc()
+    {
+        return hTextureCoord;
+    }
+
+    inline GLint getTextureLoc()
+    {
+        return hTexture;
+    }
 
 protected:
     void getVarsLocation();

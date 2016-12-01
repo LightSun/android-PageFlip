@@ -54,7 +54,6 @@ final class FoldBackVertexes extends Vertexes {
      */
     public FoldBackVertexes set(int meshCount) {
         super.set(meshCount << 1, 4, true);
-        mNext = 0;
         return this;
     }
 

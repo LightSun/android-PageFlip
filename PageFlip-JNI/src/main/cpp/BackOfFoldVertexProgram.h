@@ -17,10 +17,9 @@
 #ifndef ANDROID_PAGEFLIP_BACKOFFOLDVERTEXPROGRAM_H
 #define ANDROID_PAGEFLIP_BACKOFFOLDVERTEXPROGRAM_H
 
+#include "VertexProgram.h"
 
-#include "GLProgram.h"
-
-class BackOfFoldVertexProgram : public GLProgram
+class BackOfFoldVertexProgram : public VertexProgram
 {
 protected:
     static const char *VAR_TEXTURE_OFFSET   = "u_texXOffset";
@@ -37,6 +36,22 @@ public:
 
     void clean();
     int init();
+
+    // inline
+    inline GLint getShadowLoc()
+    {
+        return hShadow;
+    }
+
+    inline GLint getMaskColorLoc()
+    {
+        return hMaskColor;
+    }
+
+    inline GLint getTexXOffsetLoc()
+    {
+        return hTexXOffset;
+    }
 
 protected:
     void getVarsLocation();

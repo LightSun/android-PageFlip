@@ -32,7 +32,7 @@ public:
     GLProgram();
     virtual ~GLProgram();
 
-    int init(const char* shader, const char* fragment);
+    virtual int init(const char* shader, const char* fragment);
     virtual void clean();
 
     // inline

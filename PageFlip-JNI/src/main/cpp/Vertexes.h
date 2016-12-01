@@ -36,9 +36,8 @@ public:
     Vertexes(int capacity, int sizeOfPerVex, bool hasTexture = false);
     virtual ~Vertexes();
 
-    Vertexes& set(int capacity, int sizeOfPerVex, bool hasTexture = false);
-    Vertexes& setVertex(int i, float x, float y, float z, float w);
-    Vertexes& setTexCoords(int i, float x, float y);
+    void release();
+    int set(int capacity, int sizeOfPerVex, bool hasTexture = false);
     Vertexes& addVertex(float x, float y, float z);
     Vertexes& addVertex(float x, float y, float z, float w);
     Vertexes& addVertex(float x, float y, float z, float tx, float ty);

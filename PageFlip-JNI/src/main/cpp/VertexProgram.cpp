@@ -39,7 +39,7 @@ static const auto gFragmentShader =
 
 VertexProgram::VertexProgram()
         : hMVPMatrix(Constant::GL_INVALID_LOCATION),
-          hVertexPostion(Constant::GL_INVALID_LOCATION),
+          hVertexPosition(Constant::GL_INVALID_LOCATION),
           hTextureCoord(Constant::GL_INVALID_LOCATION),
           hTexture(Constant::GL_INVALID_LOCATION)
 {
@@ -55,7 +55,7 @@ void VertexProgram::clean()
     hTexture = Constant::GL_INVALID_LOCATION;
     hMVPMatrix = Constant::GL_INVALID_LOCATION;
     hTextureCoord = Constant::GL_INVALID_LOCATION;
-    hVertexPostion = Constant::GL_INVALID_LOCATION;
+    hVertexPosition = Constant::GL_INVALID_LOCATION;
 
     GLProgram::clean();
 }
@@ -80,5 +80,5 @@ void VertexProgram::getVarsLocation()
     hTexture = glGetUniformLocation(hProgram, VAR_TEXTURE);
     hMVPMatrix = glGetUniformLocation(hProgram, VAR_MVP_MATRIX);
     hTextureCoord = glGetAttribLocation(hProgram, VAR_TEXTURE_COORD);
-    hVertexPostion = glGetAttribLocation(hProgram, VAR_VERTEX_POS);
+    hVertexPosition = glGetAttribLocation(hProgram, VAR_VERTEX_POS);
 }

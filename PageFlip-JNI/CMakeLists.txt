@@ -25,7 +25,10 @@ add_library( # Sets the name of the library.
              src/main/cpp/VertexProgram.cpp
              src/main/cpp/Matrix.cpp
              src/main/cpp/ShadowVertexProgram.cpp
-             src/main/cpp/BackOfFoldVertexProgram.cpp)
+             src/main/cpp/BackOfFoldVertexProgram.cpp
+             src/main/cpp/Vertexes.cpp
+             src/main/cpp/BackOfFoldVertexes.cpp
+             src/main/cpp/ShadowVertexes.cpp)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because system libraries are included in the search path by
