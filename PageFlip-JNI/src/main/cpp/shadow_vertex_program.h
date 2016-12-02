@@ -14,29 +14,33 @@
  * limitations under the License.
  */
 
-#ifndef ANDROID_PAGEFLIP_GLSHADER_H
-#define ANDROID_PAGEFLIP_GLSHADER_H
+#ifndef ANDROID_PAGEFLIP_SHADOWVERTEXPROGRAM_H
+#define ANDROID_PAGEFLIP_SHADOWVERTEXPROGRAM_H
 
-#include <GLES2/gl2.h>
 
-class GLShader {
+#include "GLProgram.h"
+
+class ShadowVertexProgram : public GLProgram
+{
 
 protected:
-    GLuint hShader;
+    static const char *VAR_MVP_MATRIX   = "u_MVPMatrix";
+    static const char *VAR_VERTEX_Z     = "u_vexZ";
+    static const char *VAR_VERTEX_POS   = "a_vexPosition";
+
+    GLint hMVPMatrix;
+    GLint hVertexZ;
+    GLint hVertexPosition;
 
 public:
-    GLShader();
-    ~GLShader();
+    ShadowVertexProgram();
+    ~ShadowVertexProgram();
 
-    int load(GLenum type, const char* shader);
+    int init();
     void clean();
 
-    // inline
-    inline GLuint getHandle()
-    {
-        return hShader;
-    }
+protected:
+    void get_vars_location();
 };
 
-
-#endif //ANDROID_PAGEFLIP_GLSHADER_H
+#endif //ANDROID_PAGEFLIP_SHADOWVERTEXPROGRAM_H

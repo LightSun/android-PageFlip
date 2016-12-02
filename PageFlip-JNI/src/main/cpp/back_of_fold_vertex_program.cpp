@@ -48,9 +48,9 @@ static const auto gFragmentShader =
         "}";
 
 BackOfFoldVertexProgram::BackOfFoldVertexProgram()
-        : hShadow(Constant::GL_INVALID_LOCATION),
-          hMaskColor(Constant::GL_INVALID_LOCATION),
-          hTexXOffset(Constant::GL_INVALID_LOCATION)
+        : hShadow(Constant::kGlInValidLocation),
+          hMaskColor(Constant::kGlInValidLocation),
+          hTexXOffset(Constant::kGlInValidLocation)
 {
 }
 
@@ -61,9 +61,9 @@ BackOfFoldVertexProgram::~BackOfFoldVertexProgram()
 
 void BackOfFoldVertexProgram::clean()
 {
-    hShadow = Constant::GL_INVALID_LOCATION;
-    hMaskColor = Constant::GL_INVALID_LOCATION;
-    hTexXOffset = Constant::GL_INVALID_LOCATION;
+    hShadow = Constant::kGlInValidLocation;
+    hMaskColor = Constant::kGlInValidLocation;
+    hTexXOffset = Constant::kGlInValidLocation;
 
     GLProgram::clean();
 }

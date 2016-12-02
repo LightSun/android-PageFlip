@@ -38,9 +38,9 @@ static const auto gFragmentShader =
         "}";
 
 ShadowVertexProgram::ShadowVertexProgram()
-        : hMVPMatrix(Constant::GL_INVALID_LOCATION),
-          hVertexZ(Constant::GL_INVALID_LOCATION),
-          hVertexPosition(Constant::GL_INVALID_LOCATION)
+        : hMVPMatrix(Constant::kGlInValidLocation),
+          hVertexZ(Constant::kGlInValidLocation),
+          hVertexPosition(Constant::kGlInValidLocation)
 {
 }
 
@@ -51,9 +51,9 @@ ShadowVertexProgram::~ShadowVertexProgram()
 
 void ShadowVertexProgram::clean()
 {
-    hMVPMatrix = Constant::GL_INVALID_LOCATION;
-    hVertexZ = Constant::GL_INVALID_LOCATION;
-    hVertexPosition = Constant::GL_INVALID_LOCATION;
+    hMVPMatrix = Constant::kGlInValidLocation;
+    hVertexZ = Constant::kGlInValidLocation;
+    hVertexPosition = Constant::kGlInValidLocation;
 
     GLProgram::clean();
 }

@@ -23,11 +23,6 @@ class GLShader;
 
 class GLProgram {
 
-protected:
-    GLuint hProgram;
-    GLShader* mShader;
-    GLShader* mFragment;
-
 public:
     GLProgram();
     virtual ~GLProgram();
@@ -36,14 +31,19 @@ public:
     virtual void clean();
 
     // inline
-    inline int getProgram()
+    inline int get_program_ref()
     {
-        return hProgram;
+        return program_ref;
     }
 
 protected:
-    int checkGlError(const char* desc);
-    virtual void getVarsLocation() = 0;
+    int check_gl_error(const char *desc);
+    virtual void get_vars_location() = 0;
+
+protected:
+    GLuint program_ref;
+    GLShader* shader;
+    GLShader* fragment;
 };
 
 #endif //ANDROID_PAGEFLIP_GLPROGRAM_H

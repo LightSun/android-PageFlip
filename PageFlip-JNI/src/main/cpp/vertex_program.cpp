@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-#include "VertexProgram.h"
-#include "Constant.h"
-#include "Matrix.h"
+#include "vertex_program.h"
+#include "constant.h"
+#include "matrix.h"
 
-static const auto gVertexShader =
+static const auto g_vertex_shader =
         "uniform mat4 u_MVPMatrix;\n"
         "attribute vec4 a_vexPosition;\n"
         "attribute vec2 a_texCoord;\n"
@@ -29,7 +29,7 @@ static const auto gVertexShader =
         "    v_texCoord = a_texCoord;\n"
         "}";
 
-static const auto gFragmentShader =
+static const auto g_fragment_shader =
         "uniform sampler2D u_texture;\n"
         "varying vec2 v_texCoord;\n"
         "\n"
@@ -38,10 +38,10 @@ static const auto gFragmentShader =
         "}";
 
 VertexProgram::VertexProgram()
-        : hMVPMatrix(Constant::GL_INVALID_LOCATION),
-          hVertexPosition(Constant::GL_INVALID_LOCATION),
-          hTextureCoord(Constant::GL_INVALID_LOCATION),
-          hTexture(Constant::GL_INVALID_LOCATION)
+        : mvp_matrix_loc(Constant::kGlInValidLocation),
+          vertex_pos_loc(Constant::kGlInValidLocation),
+          tex_coord_loc(Constant::kGlInValidLocation),
+          texture_loc(Constant::kGlInValidLocation)
 {
 }
 
@@ -52,17 +52,17 @@ VertexProgram::~VertexProgram()
 
 void VertexProgram::clean()
 {
-    hTexture = Constant::GL_INVALID_LOCATION;
-    hMVPMatrix = Constant::GL_INVALID_LOCATION;
-    hTextureCoord = Constant::GL_INVALID_LOCATION;
-    hVertexPosition = Constant::GL_INVALID_LOCATION;
+    hTexture = Constant::kGlInValidLocation;
+    MVP_matrix = Constant::kGlInValidLocation;
+    hTextureCoord = Constant::kGlInValidLocation;
+    hVertexPosition = Constant::kGlInValidLocation;
 
     GLProgram::clean();
 }
 
 int VertexProgram::init()
 {
-    return GLProgram::init(gVertexShader, gFragmentShader);
+    return GLProgram::init(g_vertex_shader, g_fragment_shader);
 }
 
 void VertexProgram::initMatrix(float left, float right, float bottom, float top)
@@ -78,7 +78,7 @@ void VertexProgram::initMatrix(float left, float right, float bottom, float top)
 void VertexProgram::getVarsLocation()
 {
     hTexture = glGetUniformLocation(hProgram, VAR_TEXTURE);
-    hMVPMatrix = glGetUniformLocation(hProgram, VAR_MVP_MATRIX);
+    MVP_matrix = glGetUniformLocation(hProgram, VAR_MVP_MATRIX);
     hTextureCoord = glGetAttribLocation(hProgram, VAR_TEXTURE_COORD);
     hVertexPosition = glGetAttribLocation(hProgram, VAR_VERTEX_POS);
 }

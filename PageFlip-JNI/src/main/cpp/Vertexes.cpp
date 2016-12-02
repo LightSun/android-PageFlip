@@ -116,15 +116,15 @@ Vertexes& Vertexes::addVertex(float x, float y, float z, float w,
     return *this;
 }
 
-Vertexes& Vertexes::addVertex(GLPoint &p)
+Vertexes& Vertexes::addVertex(gl_point &p)
 {
     int j = mNext / mSizeOfPerVex * 2;
     mVertexes[mNext++] = p.x;
     mVertexes[mNext++] = p.y;
     mVertexes[mNext++] = p.z;
 
-    mTexCoords[j++] = p.tX;
-    mTexCoords[j] = p.tY;
+    mTexCoords[j++] = p.tx;
+    mTexCoords[j] = p.ty;
     return *this;
 }
 

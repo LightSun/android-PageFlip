@@ -20,8 +20,8 @@
 class Constant
 {
 public:
-    static const int GL_INVALID_HANDLE = 0;
-    static const int GL_INVALID_LOCATION = -1;
+    static const int kGlInvalidRef = 0;
+    static const int kGlInValidLocation = -1;
 };
 
 #endif //ANDROID_PAGEFLIP_CONSTANT_H

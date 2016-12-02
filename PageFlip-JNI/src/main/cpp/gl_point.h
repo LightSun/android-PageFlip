@@ -21,27 +21,27 @@
  * OpenGL point includes (x, y, z) coordinate in 3D system and corresponding texture coordinate
  * (x, y)
  */
-class GLPoint
-{
+class GLPoint {
+public:
+    GLPoint(float x, float y, float z, float tex_x, float tex_y)
+            : x(x), y(y), z(z), tex_x(tex_x), tex_y(tex_y)
+    { }
+
+    inline void set(float x, float y, float z, float tex_x, float tex_y)
+    {
+        this->x = x;
+        this->y = y;
+        this->z = z;
+        this->tex_x = tex_x;
+        this->tex_y = tex_y;
+    }
+
 public:
     float x;
     float y;
     float z;
 
-    float tX;
-    float tY;
-
-    GLPoint(float x, float y, float z, float tx, float ty)
-            : x(x), y(y), z(z), tX(tx), tY(ty)
-    { }
-
-    inline void set(float x, float y, float z, float tx, float ty)
-    {
-        this->x = x;
-        this->y = y;
-        this->z = z;
-        this->tX = tx;
-        this->tY = ty;
-    }
+    float tex_x;
+    float tex_y;
 };
 #endif //ANDROID_PAGEFLIP_GLPOINT_H

@@ -18,24 +18,9 @@
 #define ANDROID_PAGEFLIP_VERTEXPROGRAM_H
 
 
-#include "GLProgram.h"
+#include "gl_program.h"
 
-class VertexProgram : public GLProgram
-{
-public:
-    static float MVMatrix[16];
-    static float MVPMatrix[16];
-
-protected:
-    static const char *VAR_MVP_MATRIX       = "u_MVPMatrix";
-    static const char *VAR_VERTEX_POS       = "a_vexPosition";
-    static const char *VAR_TEXTURE_COORD    = "a_texCoord";
-    static const char *VAR_TEXTURE          = "u_texture";
-
-    GLint hMVPMatrix;
-    GLint hVertexPosition;
-    GLint hTextureCoord;
-    GLint hTexture;
+class VertexProgram : public GLProgram {
 
 public:
     VertexProgram();
@@ -43,34 +28,46 @@ public:
 
     void clean();
     int init();
-    void initMatrix(float left,
-                    float right,
-                    float bottom,
-                    float top);
+    void init_matrix(float left, float right, float bottom, float top);
 
     // inline
-    inline GLint getMVPMatrixLoc()
+    inline GLint get_MVP_matrix_loc()
     {
-        return hMVPMatrix;
+        return MVP_matrix_loc;
     }
 
-    inline GLint getVertexPositionLoc()
+    inline GLint get_vertex_pos_loc()
     {
-        return hVertexPosition;
+        return vertex_pos_loc;
     }
 
-    inline GLint getTexCoordLoc()
+    inline GLint get_tex_coord_loc()
     {
-        return hTextureCoord;
+        return tex_coord_loc;
     }
 
-    inline GLint getTextureLoc()
+    inline GLint get_texture_loc()
     {
-        return hTexture;
+        return texture_loc;
     }
 
 protected:
-    void getVarsLocation();
+    void get_vars_location();
+
+public:
+    static float mv_matrix[16];
+    static float mvp_matrix[16];
+
+protected:
+    static const char *VAR_MVP_MATRIX       = "u_MVPMatrix";
+    static const char *VAR_VERTEX_POS       = "a_vexPosition";
+    static const char *VAR_TEXTURE_COORD    = "a_texCoord";
+    static const char *VAR_TEXTURE          = "u_texture";
+
+    GLint mvp_matrix_loc;
+    GLint vertex_pos_loc;
+    GLint tex_coord_loc;
+    GLint texture_loc;
 };
 
 #endif //ANDROID_PAGEFLIP_VERTEXPROGRAM_H

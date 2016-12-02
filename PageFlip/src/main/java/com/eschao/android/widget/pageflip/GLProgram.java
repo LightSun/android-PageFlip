@@ -97,7 +97,7 @@ public class GLProgram {
         }
 
         // 5. get all variable handles defined in scripts
-        // subclass should implement getVarsLocation to be responsible for its
+        // subclass should implement get_vars_location to be responsible for its
         // own variables in script
         glUseProgram(hProgram);
         getVarsLocation();

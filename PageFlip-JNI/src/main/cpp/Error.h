@@ -17,37 +17,23 @@
 #ifndef ANDROID_PAGEFLIP_ERROR_H
 #define ANDROID_PAGEFLIP_ERROR_H
 
-class Error
-{
-private:
-    static const int _ERROR = 10;
-    static const int _ERR_GL = 1000;
+#define MAX_DESC_LENGTH 1023
 
-public:
-    static const int OK     = 0;
-    static const int ERROR  = 1;
-    static const int ERR_NULL_PARAMETER             = _ERROR + 0;
-    static const int ERR_INVALID_PARAMETER          = _ERROR + 1;
-
-    static const int ERR_GL_COMPILE_SHADER          = _ERR_GL + 0;
-    static const int ERR_GL_LINK_PROGRAM            = _ERR_GL + 1;
-    static const int ERR_GL_CREATE_SHADER_HANDLE    = _ERR_GL + 2;
-    static const int ERR_GL_CREATE_PROGRAM_HANDLE   = _ERR_GL + 3;
-    static const int ERR_GL_ATTACH_SHADER           = _ERR_GL + 4;
-    static const int ERR_GL_ATTACH_FRAGMENT         = _ERR_GL + 5;
-
-public:
-    static const int MAX_DESC_LENGTH = 1023;
-    static char desc[MAX_DESC_LENGTH + 1];
-
-    static int checkDescLenth(int len)
-    {
-        if (len > MAX_DESC_LENGTH) {
-            len = MAX_DESC_LENGTH;
-        }
-        desc[len + 1] = '\0';
-        return len;
-    }
+enum Error {
+    OK = 0,
+    ERROR,
+    ERR_NULL_PARAMETER,
+    ERR_INVALID_PARAMETER,
+    ERR_GL_COMPILE_SHADER,
+    ERR_GL_LINK_PROGRAM,
+    ERR_GL_CREATE_SHADER_REF,
+    ERR_GL_CREATE_PROGRAM_REF,
+    ERR_GL_ATTACH_SHADER,
+    ERR_GL_ATTACH_FRAGMENT,
 };
+
+extern char err_desc[MAX_DESC_LENGTH + 1];
+
+extern int check_err_desc_len(int lne);
 
 #endif //ANDROID_PAGEFLIP_ERROR_H

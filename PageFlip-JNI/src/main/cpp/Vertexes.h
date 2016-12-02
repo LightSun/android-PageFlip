@@ -18,7 +18,7 @@
 #define ANDROID_PAGEFLIP_VERTEXES_H
 
 
-#include "GLPoint.h"
+#include "gl_point.h"
 #include <GLES2/gl2.h>
 
 class Vertexes
@@ -42,7 +42,7 @@ public:
     Vertexes& addVertex(float x, float y, float z, float w);
     Vertexes& addVertex(float x, float y, float z, float tx, float ty);
     Vertexes& addVertex(float x, float y, float z, float w, float tx, float ty);
-    Vertexes& addVertex(GLPoint &p);
+    Vertexes& addVertex(gl_point &p);
 
     void drawWith(GLenum type, GLint hVertexPos, GLint hTexCoord);
     void drawWith(GLenum type, GLint hVertexPos, GLint hTexCoord, int offset, int length);
