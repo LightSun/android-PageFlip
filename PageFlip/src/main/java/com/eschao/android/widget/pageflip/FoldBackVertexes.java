@@ -128,9 +128,9 @@ final class FoldBackVertexes extends Vertexes {
         // set 0 to draw the back texture with x coordinate inversely against
         // the first texture since they are using the same texture, but in
         // double page mode, the back texture is different with the first one,
-        // it is the next page content texture and should be drawn in the same
+        // it is the m_next page content texture and should be drawn in the same
         // order with the first texture, so the value is set 1. Computing
-        // details, please see the shader script.
+        // details, please see the m_shader script.
         glUniform1f(program.hTexXOffset, hasSecondPage ? 1.0f : 0);
 
         // set mask color and alpha

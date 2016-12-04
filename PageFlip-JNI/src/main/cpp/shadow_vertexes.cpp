@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-#include "ShadowVertexes.h"
-#include "ShadowVertexProgram.h"
-#include "VertexProgram.h"
+#include "shadow_vertexes.h"
+#include "shadow_vertex_program.h"
+#include "vertex_program.h"
 
-ShadowVertexes::ShadowVertexes(int spaceOfFrontRear,
-                               float startColor, float startAlpha,
-                               float endColor, float endAlpha)
-        : mSpaceOfFrontRear(spaceOfFrontRear),
-          mBackward(0),
-          mForward(0),
-          mMaxBackward(0),
-          mVertexes(NULL)
+ShadowVertexes::ShadowVertexes(int space_of_front_rear,
+                               float start_color, float start_alpha,
+                               float end_color, float end_alpha)
+        : m_space_of_front_rear(space_of_front_rear),
+          m_backward(0),
+          m_forward(0),
+          m_max_backward(0),
+          m_vertexes(NULL)
 {
-    mColor.set(startColor, startAlpha, endColor, endAlpha);
+    color.set(start_color, start_alpha, end_color, end_alpha);
 }
 
 ShadowVertexes::~ShadowVertexes()
@@ -35,84 +35,85 @@ ShadowVertexes::~ShadowVertexes()
     release();
 }
 
-void ShadowVertexes::set(int capacity) {
-    mMaxBackward = capacity << 3;
-    mCapacity = (capacity << 4) + (mSpaceOfFrontRear << 2);
-    mVertexes = new float[mCapacity];
+void ShadowVertexes::set(int mesh_count) {
+    m_max_backward = mesh_count<< 3;
+    m_capacity = (mesh_count<< 4) + (m_space_of_front_rear << 2);
+    m_vertexes = new float[m_capacity];
     reset();
 }
 
 void ShadowVertexes::release()
 {
-    if (mVertexes)
-    {
-        delete[] mVertexes;
+    if (m_vertexes) {
+        delete[] m_vertexes;
     }
 
-    mBackward = 0;
-    mForward = 0;
-    mMaxBackward = 0;
-    mSpaceOfFrontRear = 0;
-    mCapacity = 0;
+    m_backward = 0;
+    m_forward = 0;
+    m_max_backward = 0;
+    m_space_of_front_rear = 0;
+    m_capacity = 0;
 }
 
-ShadowVertexes& ShadowVertexes::setVertexes(int offset,
-                                            float startX, float startY,
-                                            float endX, float endY)
+ShadowVertexes& ShadowVertexes::set_vertexes(int offset,
+                                             float start_x, float start_y,
+                                             float end_x, float end_y)
 {
-    mVertexes[offset++] = startX;
-    mVertexes[offset++] = startY;
-    mVertexes[offset++] = mColor.startColor;
-    mVertexes[offset++] = mColor.startAlpha;
-    mVertexes[offset++] = endX;
-    mVertexes[offset++] = endY;
-    mVertexes[offset++] = mColor.endColor;
-    mVertexes[offset] = mColor.endAlpha;
+    m_vertexes[offset++] = start_x;
+    m_vertexes[offset++] = start_y;
+    m_vertexes[offset++] = color.start_color;
+    m_vertexes[offset++] = color.start_alpha;
+    m_vertexes[offset++] = end_x;
+    m_vertexes[offset++] = end_y;
+    m_vertexes[offset++] = color.end_color;
+    m_vertexes[offset] = color.end_alpha;
     return *this;
 }
 
-ShadowVertexes& ShadowVertexes::addVertexesBackward(float startX, float startY,
-                                                    float endX, float endY)
+ShadowVertexes& ShadowVertexes::add_vertexes_backward(float start_x, float start_y,
+                                                      float end_x, float end_y)
 {
-    mVertexes[--mBackward] = startX;
-    mVertexes[--mBackward] = startY;
-    mVertexes[--mBackward] = mColor.startColor;
-    mVertexes[--mBackward] = mColor.startAlpha;
-    mVertexes[--mBackward] = endX;
-    mVertexes[--mBackward] = endY;
-    mVertexes[--mBackward] = mColor.endColor;
-    mVertexes[--mBackward] = mColor.endAlpha;
+    m_vertexes[--m_backward] = start_x;
+    m_vertexes[--m_backward] = start_y;
+    m_vertexes[--m_backward] = color.start_color;
+    m_vertexes[--m_backward] = color.start_alpha;
+    m_vertexes[--m_backward] = end_x;
+    m_vertexes[--m_backward] = end_y;
+    m_vertexes[--m_backward] = color.end_color;
+    m_vertexes[--m_backward] = color.end_alpha;
     return *this;
 }
 
-ShadowVertexes& ShadowVertexes::addVertexesForward(float startX, float startY,
-                                                   float endX, float endY)
+ShadowVertexes& ShadowVertexes::add_vertexes_forward(float start_x, float start_y,
+                                                     float end_x, float end_y)
 {
-    mVertexes[mForward++] = startX;
-    mVertexes[mForward++] = startY;
-    mVertexes[mForward++] = mColor.startColor;
-    mVertexes[mForward++] = mColor.startAlpha;
-    mVertexes[mForward++] = endX;
-    mVertexes[mForward++] = endY;
-    mVertexes[mForward++] = mColor.endColor;
-    mVertexes[mForward++] = mColor.endAlpha;
+    m_vertexes[m_forward++] = start_x;
+    m_vertexes[m_forward++] = start_y;
+    m_vertexes[m_forward++] = color.start_color;
+    m_vertexes[m_forward++] = color.start_alpha;
+    m_vertexes[m_forward++] = end_x;
+    m_vertexes[m_forward++] = end_y;
+    m_vertexes[m_forward++] = color.end_color;
+    m_vertexes[m_forward++] = color.end_alpha;
     return *this;
 }
 
 void ShadowVertexes::draw(ShadowVertexProgram &program)
 {
-    if (mCount > 0)
-    {
-        glUniformMatrix4fv(program.getMVPMatrixLoc(), 1, GL_FALSE, VertexProgram::MVPMatrix);
-        glUniform1f(program.getVertexZ, mVertexZ);
+    int count = (m_forward - m_backward) >> 2;
+    if (count > 0) {
+        glUniformMatrix4fv(program.mvp_matrix_loc(), 1, GL_FALSE,
+                           VertexProgram::mvp_matrix);
+        glUniform1f(program.vertex_z_loc(), m_vertex_z);
 
         glDisable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        glVertexAttribPointer(program.getVertexPositionLoc(), 4, GL_FLOAT, GL_FALSE, 0, mVertexes);
-        glEnableVertexAttribArray(program.getVertexPositionLoc());
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, mCount);
+        glVertexAttribPointer(program.vertex_pos_loc(), 4, GL_FLOAT, GL_FALSE,
+                              0, m_vertexes);
+        glEnableVertexAttribArray(program.vertex_pos_loc());
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, count);
 
         glDisable(GL_BLEND);
     }

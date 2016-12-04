@@ -17,17 +17,12 @@
 #ifndef ANDROID_PAGEFLIP_SHADOWWIDTH_H
 #define ANDROID_PAGEFLIP_SHADOWWIDTH_H
 
-#include "Error.h"
+#include "error.h"
 
-class ShadowWidth
-{
-protected:
-    float mMin;
-    float mMax;
-    float mRatio;
+class ShadowWidth {
 
 public:
-    ShadowWidth() : mMin(0), mMax(0), mRatio(0)
+    ShadowWidth() : m_min(0), m_max(0), m_ratio(0)
     { }
 
     ShadowWidth(float min, float max, float ratio)
@@ -38,33 +33,35 @@ public:
     inline int set(float min, float max, float ratio)
     {
         if (min < 0 || max < 0 || min > max ||
-            ratio <= 0 || ratio > 1)
-        {
+            ratio <= 0 || ratio > 1) {
             return Error::ERR_INVALID_PARAMETER;
         }
 
-        mMin = min;
-        mMax = max;
-        mRatio = ratio;
+        this->m_min = min;
+        this->m_max = max;
+        this->m_ratio = ratio;
         return Error::OK;
     }
 
-    inline float width(int r)
+    inline float width(float r)
     {
-        float w = r * mRatio;
-        if (w < mMin)
-        {
-            return mMin;
+        float w = r * m_ratio;
+        if (w < m_min) {
+            return m_min;
         }
-        else if (w > mMax)
-        {
-            return mMax;
+        else if (w > m_max) {
+            return m_max;
         }
-        else
-        {
+        else {
             return w;
         }
     }
+
+protected:
+    float m_min;
+    float m_max;
+    float m_ratio;
+
 };
 
 #endif //ANDROID_PAGEFLIP_SHADOWWIDTH_H

@@ -20,7 +20,7 @@ import android.content.Context;
 import static android.opengl.GLES20.glGetUniformLocation;
 
 /**
- * FoldBack vertex shader program which is used to load:
+ * FoldBack vertex m_shader program which is used to load:
  * <ul>
  *     <li>fold_back_fragment_shader.glsl</li>
  *     <li>fold_back_vertex_shader.glsl</li>
@@ -48,11 +48,11 @@ public class FoldBackVertexProgram extends VertexProgram {
     }
 
     /**
-     * Initiate shader program
+     * Initiate m_shader program
      *
      * @param context Android app context
      * @return self
-     * @throws PageFlipException if fail to read and compile shader scripts
+     * @throws PageFlipException if fail to read and compile m_shader scripts
      */
     public FoldBackVertexProgram init(Context context) throws
                                                        PageFlipException {
@@ -63,7 +63,7 @@ public class FoldBackVertexProgram extends VertexProgram {
     }
 
     /**
-     * Get variable handles defined in shader script
+     * Get variable handles defined in m_shader script
      */
     protected void getVarsLocation() {
         super.getVarsLocation();

@@ -29,7 +29,7 @@ final class ShadowWidth {
     // maximal shadow width
     float mMax;
 
-    // the shadow width ratio based on fold cylinder radius
+    // the shadow width m_ratio based on fold cylinder radius
     // shadow width will be dynamically computed upon fold cylinder radius
     float mRatio;
 
@@ -38,11 +38,11 @@ final class ShadowWidth {
     }
 
     /**
-     * Set minimal, maximal and ratio value of shadow width
+     * Set minimal, maximal and m_ratio value of shadow width
      *
      * @param min minimal value
      * @param max maximal value
-     * @param ratio width ratio based on fold cylinder radius
+     * @param ratio width m_ratio based on fold cylinder radius
      */
     public void set(float min, float max, float ratio) {
         if (min < 0 || max < 0 || min > max ||

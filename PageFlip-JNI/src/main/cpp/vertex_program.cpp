@@ -38,10 +38,10 @@ static const auto g_fragment_shader =
         "}";
 
 VertexProgram::VertexProgram()
-        : mvp_matrix_loc(Constant::kGlInValidLocation),
-          vertex_pos_loc(Constant::kGlInValidLocation),
-          tex_coord_loc(Constant::kGlInValidLocation),
-          texture_loc(Constant::kGlInValidLocation)
+        : m_mvp_matrix_loc(Constant::kGlInValidLocation),
+          m_vertex_pos_loc(Constant::kGlInValidLocation),
+          m_tex_coord_loc(Constant::kGlInValidLocation),
+          m_texture_loc(Constant::kGlInValidLocation)
 {
 }
 
@@ -52,10 +52,10 @@ VertexProgram::~VertexProgram()
 
 void VertexProgram::clean()
 {
-    hTexture = Constant::kGlInValidLocation;
-    MVP_matrix = Constant::kGlInValidLocation;
-    hTextureCoord = Constant::kGlInValidLocation;
-    hVertexPosition = Constant::kGlInValidLocation;
+    m_texture_loc = Constant::kGlInValidLocation;
+    m_mvp_matrix_loc = Constant::kGlInValidLocation;
+    m_tex_coord_loc = Constant::kGlInValidLocation;
+    m_vertex_pos_loc = Constant::kGlInValidLocation;
 
     GLProgram::clean();
 }
@@ -65,20 +65,21 @@ int VertexProgram::init()
     return GLProgram::init(g_vertex_shader, g_fragment_shader);
 }
 
-void VertexProgram::initMatrix(float left, float right, float bottom, float top)
+void VertexProgram::init_matrix(float left, float right,
+                                float bottom, float top)
 {
     float projectMatrix[16];
-    Matrix::orthoM(projectMatrix, left, right, bottom, top, 0, 6000);
-    Matrix::setIdentityM(MVMatrix);
-    Matrix::setLookAtM(MVMatrix, 0, 0, 3000, 0, 0, 0, 0, 1, 0);
-    Matrix::setIdentityM(MVPMatrix);
-    Matrix::multiplyMM(MVPMatrix, projectMatrix, MVMatrix);
+    Matrix::ortho(projectMatrix, left, right, bottom, top, 0, 6000);
+    Matrix::set_identity(mv_matrix);
+    Matrix::set_look_at(mv_matrix, 0, 0, 3000, 0, 0, 0, 0, 1, 0);
+    Matrix::set_identity(mvp_matrix);
+    Matrix::multiply_mm(mvp_matrix, projectMatrix, mv_matrix);
 }
 
-void VertexProgram::getVarsLocation()
+void VertexProgram::get_vars_location()
 {
-    hTexture = glGetUniformLocation(hProgram, VAR_TEXTURE);
-    MVP_matrix = glGetUniformLocation(hProgram, VAR_MVP_MATRIX);
-    hTextureCoord = glGetAttribLocation(hProgram, VAR_TEXTURE_COORD);
-    hVertexPosition = glGetAttribLocation(hProgram, VAR_VERTEX_POS);
+    m_texture_loc = glGetUniformLocation(m_program_ref, VAR_TEXTURE);
+    m_mvp_matrix_loc = glGetUniformLocation(m_program_ref, VAR_MVP_MATRIX);
+    m_tex_coord_loc = glGetAttribLocation(m_program_ref, VAR_TEXTURE_COORD);
+    m_vertex_pos_loc = glGetAttribLocation(m_program_ref, VAR_VERTEX_POS);
 }

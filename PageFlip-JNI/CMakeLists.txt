@@ -18,16 +18,20 @@ add_library( # Sets the name of the library.
              # Provides a relative path to your source file(s).
              # Associated headers in the same location as their source
              # file are automatically included.
+             src/main/cpp/error.cpp
              src/main/cpp/gl_view_rect.cpp
-             src/main/cpp/gl_program.cpp)
-             #src/main/cpp/gl_shader.cpp
-             #src/main/cpp/vertex_program.cpp
-             #src/main/cpp/matrix.cpp
-             #src/main/cpp/shadow_vertex_program.cpp
-             #src/main/cpp/back_of_fold_vertex_program.cpp
-             #src/main/cpp/vertexes.cpp
+             src/main/cpp/gl_program.cpp
+             src/main/cpp/gl_shader.cpp
+             src/main/cpp/matrix.cpp
+             src/main/cpp/vertex_program.cpp
+             src/main/cpp/shadow_vertex_program.cpp
+             src/main/cpp/back_of_fold_vertex_program.cpp
+             #src/main/cpp/m_vertexes.cpp
+             #src/main/cpp/shadow_vertexes.cpp
              #src/main/cpp/back_of_fold_vertexes.cpp
-             #src/main/cpp/shadow_vertexes.cpp)
+             #src/main/cpp/page.cpp
+             #src/main/cpp/page_flip.cpp
+             )
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because system libraries are included in the search path by

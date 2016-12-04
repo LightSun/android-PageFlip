@@ -27,28 +27,28 @@ public:
     ~VertexProgram();
 
     void clean();
-    int init();
+    virtual int init();
     void init_matrix(float left, float right, float bottom, float top);
 
     // inline
-    inline GLint get_MVP_matrix_loc()
+    inline GLint mvp_matrix_loc()
     {
-        return MVP_matrix_loc;
+        return m_mvp_matrix_loc;
     }
 
-    inline GLint get_vertex_pos_loc()
+    inline GLint vertex_pos_loc()
     {
-        return vertex_pos_loc;
+        return m_vertex_pos_loc;
     }
 
-    inline GLint get_tex_coord_loc()
+    inline GLint tex_coord_loc()
     {
-        return tex_coord_loc;
+        return m_tex_coord_loc;
     }
 
-    inline GLint get_texture_loc()
+    inline GLint texture_loc()
     {
-        return texture_loc;
+        return m_texture_loc;
     }
 
 protected:
@@ -64,10 +64,10 @@ protected:
     static const char *VAR_TEXTURE_COORD    = "a_texCoord";
     static const char *VAR_TEXTURE          = "u_texture";
 
-    GLint mvp_matrix_loc;
-    GLint vertex_pos_loc;
-    GLint tex_coord_loc;
-    GLint texture_loc;
+    GLint m_mvp_matrix_loc;
+    GLint m_vertex_pos_loc;
+    GLint m_tex_coord_loc;
+    GLint m_texture_loc;
 };
 
 #endif //ANDROID_PAGEFLIP_VERTEXPROGRAM_H

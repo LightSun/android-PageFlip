@@ -19,7 +19,7 @@
 #include "error.h"
 
 GLShader::GLShader()
-        : shader_ref(Constant::kGlInvalidRef)
+        : m_shader_ref(Constant::kGlInvalidRef)
 
 {
 }
@@ -29,29 +29,29 @@ GLShader::~GLShader()
     clean();
 }
 
-int GLShader::load(GLenum type, const char *shader)
+int GLShader::load(GLenum type, const char *shader_glsl)
 {
     clean();
 
-    shader_ref= glCreateShader(type);
-    if (shader_ref == Constant::kGlInvalidRef) {
+    m_shader_ref= glCreateShader(type);
+    if (m_shader_ref == Constant::kGlInvalidRef) {
         return Error::ERR_GL_CREATE_SHADER_REF;
     }
 
-    glShaderSource(shader_ref, 1, &shader, NULL);
-    glCompileShader(shader_ref);
+    glShaderSource(m_shader_ref, 1, &shader_glsl, NULL);
+    glCompileShader(m_shader_ref);
 
     GLint compiled = 0;
-    glGetShaderiv(shader_ref, GL_COMPILE_STATUS, &compiled);
+    glGetShaderiv(m_shader_ref, GL_COMPILE_STATUS, &compiled);
     if (!compiled) {
         GLint info_len = 0;
-        glGetShaderiv(shader_ref, GL_INFO_LOG_LENGTH, &info_len);
+        glGetShaderiv(m_shader_ref, GL_INFO_LOG_LENGTH, &info_len);
 
         if (info_len) {
             info_len = check_err_desc_len(info_len);
-            glGetShaderInfoLog(shader_ref, info_len, NULL, err_desc);
-            glDeleteShader(shader_ref);
-            shader_ref = Constant::kGlInvalidRef;
+            glGetShaderInfoLog(m_shader_ref, info_len, NULL, err_desc);
+            glDeleteShader(m_shader_ref);
+            m_shader_ref = Constant::kGlInvalidRef;
         }
 
         return Error::ERR_GL_COMPILE_SHADER;
@@ -62,8 +62,8 @@ int GLShader::load(GLenum type, const char *shader)
 
 void GLShader::clean()
 {
-    if (shader_ref != Constant::kGlInvalidRef) {
-        glDeleteShader(shader_ref);
-        shader_ref = Constant::kGlInvalidRef;
+    if (m_shader_ref != Constant::kGlInvalidRef) {
+        glDeleteShader(m_shader_ref);
+        m_shader_ref = Constant::kGlInvalidRef;
     }
 }

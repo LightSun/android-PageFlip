@@ -16,7 +16,6 @@
 
 #include <iostream>
 #include "gl_program.h"
-#include "gl_shader.h"
 #include "error.h"
 #include "constant.h"
 
@@ -24,9 +23,7 @@ using namespace std;
 
 GLProgram::GLProgram()
 {
-    program_ref = Constant::kGlInvalidRef;
-    shader = new GLShader();
-    fragment = new GLShader();
+    m_program_ref = Constant::kGlInvalidRef;
 }
 
 GLProgram::~GLProgram()
@@ -36,70 +33,63 @@ GLProgram::~GLProgram()
 
 void GLProgram::clean()
 {
-    shader->clean();
-    fragment->clean();
+    m_shader.clean();
+    m_fragment.clean();
 
-    if (program_ref != Constant::kGlInvalidRef)
-    {
-        glDeleteProgram(program_ref);
-        program_ref = Constant::kGlInvalidRef;
+    if (m_program_ref != Constant::kGlInvalidRef) {
+        glDeleteProgram(m_program_ref);
+        m_program_ref = Constant::kGlInvalidRef;
     }
 }
 
-int GLProgram::init(const char *shader, const char *fragment)
+int GLProgram::init(const char *shader_glsl, const char *fragment_glsl)
 {
-    if (shader == NULL || fragment == NULL)
-    {
+    if (shader_glsl == NULL || fragment_glsl == NULL) {
         return Error::ERR_NULL_PARAMETER;
     }
 
-    int error = shader->load(GL_VERTEX_SHADER, shader);
-    if (error != Error::OK)
-    {
+    int error = m_shader.load(GL_VERTEX_SHADER, shader_glsl);
+    if (error != Error::OK) {
         return error;
     }
 
-    error = fragment->load(GL_FRAGMENT_SHADER, fragment);
-    if (error != Error::OK)
-    {
+    error = m_fragment.load(GL_FRAGMENT_SHADER, fragment_glsl);
+    if (error != Error::OK) {
         return error;
     }
 
-    program_ref = glCreateProgram();
-    if (program_ref == Constant::kGlInvalidRef)
-    {
-        shader->clean();
-        fragment->clean();
+    m_program_ref = glCreateProgram();
+    if (m_program_ref == Constant::kGlInvalidRef) {
+        m_shader.clean();
+        m_fragment.clean();
         return Error::ERR_GL_CREATE_PROGRAM_REF;
     }
 
-    glAttachShader(program_ref, shader->getHandle());
-    error = check_gl_error("When attach shader(glAttachShader)");
-    if (error != Error::OK)
-    {
+    glAttachShader(m_program_ref, m_shader.shader_ref());
+    error = check_gl_error("When attach m_shader(glAttachShader)");
+    if (error != Error::OK) {
         clean();
         return Error::ERR_GL_ATTACH_SHADER;
     }
 
-    glAttachShader(program_ref, fragment->getHandle());
-    error = check_gl_error("When attach fragment(glAttachShader");
-    if (error != Error::OK)
-    {
+    glAttachShader(m_program_ref, m_fragment.shader_ref());
+    error = check_gl_error("When attach m_fragment(glAttachShader");
+    if (error != Error::OK) {
         clean();
         return Error::ERR_GL_ATTACH_FRAGMENT;
     }
 
-    glLinkProgram(program_ref);
+    glLinkProgram(m_program_ref);
     GLint link_status = GL_FALSE;
-    glGetProgramiv(program_ref, GL_LINK_STATUS, &link_status);
-    if (link_status != GL_TRUE)
-    {
+    glGetProgramiv(m_program_ref, GL_LINK_STATUS, &link_status);
+
+    if (link_status != GL_TRUE) {
         GLint info_len = 0;
-        glGetProgramiv(program_ref, GL_INFO_LOG_LENGTH, &info_len);
-        if (info_len)
-        {
+        glGetProgramiv(m_program_ref, GL_INFO_LOG_LENGTH, &info_len);
+
+        if (info_len) {
             info_len = check_err_desc_len(info_len);
-            glGetProgramInfoLog(program_ref, info_len, NULL, err_desc);
+            glGetProgramInfoLog(m_program_ref, info_len, NULL, err_desc);
         }
 
         clean();

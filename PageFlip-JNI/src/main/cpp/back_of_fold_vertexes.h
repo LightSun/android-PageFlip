@@ -18,50 +18,52 @@
 #define ANDROID_PAGEFLIP_BACKOFFOLDVERTEXES_H
 
 
-#include "Vertexes.h"
-#include "Error.h"
+#include "vertexes.h"
+#include "error.h"
 
 class Page;
 class BackOfFoldVertexProgram;
 
-class BackOfFoldVertexes : public Vertexes
-{
-protected:
-    float mMaskAlpha;
+class BackOfFoldVertexes : public Vertexes {
 
 public:
     BackOfFoldVertexes();
     ~BackOfFoldVertexes();
 
     void draw(BackOfFoldVertexProgram& program, Page& page,
-              bool hasSecondPage, int gradientLightId);
+              bool has_second_page, GLuint gradient_light_id);
+
     //inline
-    inline int set(int capacity)
+    inline int set(int mesh_count)
     {
-        return Vertexes::set(capacity << 1, 4, true);
+        return Vertexes::set(mesh_count << 1, 4, true);
     }
 
-    inline int setMaskAlpha(int alpha)
-    {
-        if (alpha < 0 || alpha > 255)
-        {
-            return Error::ERR_INVALID_PARAMETER;
-        }
-
-        mMaskAlpha = alpha / 255.0f;
-        return Error::OK;
-    }
-
-    inline int setMaskAlpha(float alpha)
+    inline int set_mask_alpha(int alpha)
     {
         if (alpha < 0 || alpha > 255)
         {
             return Error::ERR_INVALID_PARAMETER;
         }
 
-        mMaskAlpha = alpha;
+        m_mask_alpha = alpha / 255.0f;
         return Error::OK;
     }
+
+    inline int set_mask_alpha(float alpha)
+    {
+        if (alpha < 0 || alpha > 255)
+        {
+            return Error::ERR_INVALID_PARAMETER;
+        }
+
+        m_mask_alpha = alpha;
+        return Error::OK;
+    }
+
+protected:
+    float m_mask_alpha;
+
 };
 
 

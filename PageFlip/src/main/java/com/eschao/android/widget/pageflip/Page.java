@@ -125,7 +125,7 @@ public class Page {
     };
 
     /**
-     * <p>When page is curled, there are 4 kinds of vertexes orders for drawing
+     * <p>When page is curled, there are 4 kinds of m_vertexes orders for drawing
      * first texture and second texture with TRIANGLE_STRIP way</p><pre>
      *     A             B              C              D
      * 2       1     2     X 1      2 X     1      2       1
@@ -192,7 +192,7 @@ public class Page {
     private GPoint mXFoldP;
     private GPoint mYFoldP;
 
-    // vertexes and texture coordinates buffer for full page
+    // m_vertexes and texture coordinates buffer for full page
     private FloatBuffer mFullPageVexBuf;
     private FloatBuffer mFullPageTexCoordsBuf;
 
@@ -210,7 +210,7 @@ public class Page {
 
     // texture(front, back and second) ids allocated by OpenGL
     private int[] mTexIDs;
-    // unused texture ids, will be deleted when next OpenGL drawing
+    // unused texture ids, will be deleted when m_next OpenGL drawing
     private int[] mUnusedTexIDs;
     // actual size of mUnusedTexIDs
     private int mUnusedTexSize;
@@ -341,7 +341,7 @@ public class Page {
     /**
      * Recycle the first texture id and set it with the second texture
      * <p>Manually call this function to set the first texture with the second
-     * one after page forward flipped over in single page mode.</p>
+     * one after page m_forward flipped over in single page mode.</p>
      *
      * @return self
      */
@@ -361,7 +361,7 @@ public class Page {
     /**
      * Recycle the second texture id and set it with the first texture
      * <p>Manually call this function to set the second texture with the first
-     * one when page is backward flipping in single page mode.</p>
+     * one when page is m_backward flipping in single page mode.</p>
      *
      * @return self
      */
@@ -437,7 +437,7 @@ public class Page {
      * Is given x coordinate in specified page range?
      *
      * @param x x coordinate
-     * @param ratio range ratio based on page width, start from OriginP.x
+     * @param ratio range m_ratio based on page width, start from OriginP.x
      * @return True if x is in specified range
      */
     boolean isXInRange(float x, float ratio) {
@@ -628,7 +628,7 @@ public class Page {
     /**
      * Draw front page when page is flipping
      *
-     * @param program GL shader program
+     * @param program GL m_shader program
      * @param vertexes Vertexes of the curled front page
      */
     public void drawFrontPage(VertexProgram program,
@@ -654,7 +654,7 @@ public class Page {
     /**
      * Draw full page
      *
-     * @param program GL shader program
+     * @param program GL m_shader program
      * @param isFirst use the first or second texture to draw
      */
     public void drawFullPage(VertexProgram program, boolean isFirst) {
@@ -685,10 +685,10 @@ public class Page {
     }
 
     /**
-     * Create vertexes buffer
+     * Create m_vertexes buffer
      */
     private void createVertexesBuffer() {
-        // 4 vertexes for full page
+        // 4 m_vertexes for full page
         mFullPageVexBuf = ByteBuffer.allocateDirect(48)
                                     .order(ByteOrder.nativeOrder())
                                     .asFloatBuffer();
@@ -702,7 +702,7 @@ public class Page {
     }
 
     /**
-     * Build vertexes of page when page is flipping vertically
+     * Build m_vertexes of page when page is flipping vertically
      * <pre>
      *        <---- flip
      *     1        fY    2
@@ -727,7 +727,7 @@ public class Page {
      *      3 -> 2 -> fX -> fY</li>
      * </ul>
      *
-     * @param frontVertexes vertexes for drawing font part of page
+     * @param frontVertexes m_vertexes for drawing font part of page
      * @param xFoldP1 fold point on X axis
      */
     public void buildVertexesOfPageWhenVertical(Vertexes frontVertexes,
@@ -756,7 +756,7 @@ public class Page {
             frontVertexes.addVertex(mXFoldP).addVertex(mYFoldP);
         }
 
-        // add the leftover vertexes for the first texture
+        // add the leftover m_vertexes for the first texture
         for (int i = 1; i < vexOrder[0]; ++i) {
             int k = apexOrder[vexOrder[i]];
             int m = k * 3;
@@ -775,7 +775,7 @@ public class Page {
             frontVertexes.addVertex(mXFoldP).addVertex(mYFoldP);
         }
 
-        // add the remaining vertexes for the second texture
+        // add the remaining m_vertexes for the second texture
         for (int i = vexOrder[0]; i < vexOrder.length; ++i) {
             int k = apexOrder[vexOrder[i]];
             int m = k * 3;
@@ -786,11 +786,11 @@ public class Page {
     }
 
     /**
-     * Build vertexes of page when page flip is slope
+     * Build m_vertexes of page when page flip is slope
      * <p>See {@link #mApexOrderIndex} and {@link #mFoldVexOrders} to get more
      * details</p>
      *
-     * @param frontVertexes vertexes for drawing front part of page
+     * @param frontVertexes m_vertexes for drawing front part of page
      * @param xFoldP1 fold point on X axis
      * @param yFoldP1 fold point on Y axis
      * @param kValue tan value of page curling angle
@@ -837,7 +837,7 @@ public class Page {
             frontVertexes.addVertex(mXFoldP).addVertex(mYFoldP);
         }
 
-        // add the leftover vertexes for the first texture
+        // add the leftover m_vertexes for the first texture
         for (int i = 1; i < vexOrder[0]; ++i) {
             int k = apexOrder[vexOrder[i]];
             int m = k * 3;
@@ -856,7 +856,7 @@ public class Page {
             frontVertexes.addVertex(mXFoldP).addVertex(mYFoldP);
         }
 
-        // add the remaining vertexes for the second texture
+        // add the remaining m_vertexes for the second texture
         for (int i = vexOrder[0]; i < vexOrder.length; ++i) {
             int k = apexOrder[vexOrder[i]];
             int m = k * 3;
@@ -867,7 +867,7 @@ public class Page {
     }
 
     /**
-     * Build vertexes of full page
+     * Build m_vertexes of full page
      * <pre>
      *        <---- flip
      *     3              2

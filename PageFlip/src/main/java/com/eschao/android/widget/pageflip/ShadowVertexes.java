@@ -49,7 +49,7 @@ import static android.opengl.GLES20.glVertexAttribPointer;
  */
 class ShadowVertexes {
 
-    // how many vertexes in vertex float buffer will be drawn on screen
+    // how many m_vertexes in vertex float buffer will be drawn on screen
     int mVertexesSize;
 
     // universal Z coordinate for all shadow vertex
@@ -57,26 +57,26 @@ class ShadowVertexes {
     // issue
     float vertexZ;
 
-    // float array and float buffer for storing vertexes
+    // float array and float buffer for storing m_vertexes
     float[] mVertexes;
     FloatBuffer mVertexesBuffer;
 
     // shadow color
     ShadowColor mColor;
 
-    // the start position of backward vertexes
+    // the start position of m_backward m_vertexes
     int mMaxBackward;
 
-    // reserve space between backward and forward index
+    // reserve space between m_backward and m_forward index
     // need to preserver space for fold top edge shadow when compute fold edge
     // shadow since the top edge shadow will be computed at last
     //
     // +--------------------+------------+--------------------+
-    // |   <-- mBackward    |  reserved  |    mForward -->    |
+    // |   <-- m_backward    |  reserved  |    m_forward -->    |
     // +--------------------+------------+--------------------+
     private int mSpaceOfFrontRear;
 
-    // forward and backward index for adding vertex
+    // m_forward and m_backward index for adding vertex
     private int mBackward;
     private int mForward;
 
@@ -112,9 +112,9 @@ class ShadowVertexes {
      * @return self
      */
     public ShadowVertexes set(int meshCount) {
-        // every mesh need two vertexes:
-        // (startX, startY , startColor, startAlpha)  and
-        // (endX, endY, endColor, endAlpha), that is why it is meshCount * 8
+        // every mesh need two m_vertexes:
+        // (startX, startY , start_color, start_alpha)  and
+        // (endX, endY, end_color, end_alpha), that is why it is meshCount * 8
         mMaxBackward = meshCount << 3;
 
         // double meshCount since fold shadow has two sides, for example:
@@ -142,8 +142,8 @@ class ShadowVertexes {
 
     /**
      * Reset index of float array before adding vertex to buffer
-     * <p>There are two index: forward and backward, all of them have to be
-     * reset to middle position(exclude reserved space) before adding vertexes
+     * <p>There are two index: m_forward and m_backward, all of them have to be
+     * reset to middle position(exclude reserved space) before adding m_vertexes
      * </p>
      */
     public void reset() {
@@ -228,7 +228,7 @@ class ShadowVertexes {
      * Add vertex to float buffer
      * Call {@link #reset()} before calling any add operations
      *
-     * @param isForward is backward or forward adding
+     * @param isForward is m_backward or m_forward adding
      * @param startX start x coordinate
      * @param startY start y coordinate
      * @param endX end x coordinate
@@ -269,7 +269,7 @@ class ShadowVertexes {
     /**
      * Draw shadow
      *
-     * @param program shadow vertex shader program
+     * @param program shadow vertex m_shader program
      */
     public void draw(ShadowVertexProgram program) {
         if (mVertexesSize > 0) {

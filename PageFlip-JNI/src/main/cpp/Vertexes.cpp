@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-#include "Vertexes.h"
-#include "Error.h"
+#include "vertexes.h"
+#include "error.h"
 
 Vertexes::Vertexes()
-        : mNext(0),
-          mCapacity(0),
-          mSizeOfPerVex(0),
-          mVertexes(NULL),
-          mTexCoords(NULL)
+        : m_next(0),
+          m_capacity(0),
+          m_size_of_per_vex(0),
+          m_vertexes(NULL),
+          m_tex_coords(NULL)
 {
 }
 
-Vertexes::Vertexes(int capacity, int sizeOfPerVex, bool hasTexture)
+Vertexes::Vertexes(int capacity, int size_per_vex, bool has_texture)
 {
-    set(capacity, sizeOfPerVex, hasTexture);
+    set(capacity, size_per_vex, has_texture);
 }
 
 Vertexes::~Vertexes()
@@ -38,115 +38,118 @@ Vertexes::~Vertexes()
 
 void Vertexes::release()
 {
-    if (mVertexes)
+    if (m_vertexes)
     {
-        delete mVertexes[mCapacity * mSizeOfPerVex];
+        delete m_vertexes[m_capacity * m_size_of_per_vex];
     }
 
-    if (mTexCoords)
+    if (m_tex_coords)
     {
-        delete mTexCoords[mCapacity << 1];
+        delete m_tex_coords[m_capacity << 1];
     }
 
-    mNext = 0;
-    mCapacity = 0;
-    mSizeOfPerVex = 0;
+    m_next = 0;
+    m_capacity = 0;
+    m_size_of_per_vex = 0;
 }
 
-int Vertexes::set(int capacity, int sizeOfPerVex, bool hasTexture)
+int Vertexes::set(int capacity, int size_of_per_vex, bool has_texture)
 {
-    if (sizeOfPerVex < 2)
+    if (size_of_per_vex < 2)
     {
         return Error::ERR_INVALID_PARAMETER;
     }
 
     release();
-    mCapacity = capacity;
-    mSizeOfPerVex = sizeOfPerVex;
-    mVertexes = new float[capacity * sizeOfPerVex];
+    this->m_capacity = capacity;
+    this->m_size_of_per_vex = size_of_per_vex;
+    m_vertexes = new float[capacity * size_of_per_vex];
 
-    if (hasTexture)
-    {
-        mTexCoords = new float[capacity << 1];
+    if (has_texture) {
+        m_tex_coords = new float[capacity << 1];
     }
     return Error::OK;
 }
 
-Vertexes& Vertexes::addVertex(float x, float y, float z)
+Vertexes& Vertexes::add_vertex(float x, float y, float z)
 {
-    mVertexes[mNext++] = x;
-    mVertexes[mNext++] = y;
-    mVertexes[mNext++] = z;
+    m_vertexes[m_next++] = x;
+    m_vertexes[m_next++] = y;
+    m_vertexes[m_next++] = z;
     return *this;
 }
 
-Vertexes& Vertexes::addVertex(float x, float y, float z,
-                              float tx, float ty)
+Vertexes& Vertexes::add_vertex(float x, float y, float z,
+                               float tx, float ty)
 {
-    int j = mNext / mSizeOfPerVex * 2;
-    mVertexes[mNext++] = x;
-    mVertexes[mNext++] = y;
-    mVertexes[mNext++] = z;
+    int j = m_next / m_size_of_per_vex * 2;
+    m_vertexes[m_next++] = x;
+    m_vertexes[m_next++] = y;
+    m_vertexes[m_next++] = z;
 
-    mTexCoords[j++] = tx;
-    mTexCoords[j] = ty;
+    m_tex_coords[j++] = tx;
+    m_tex_coords[j] = ty;
     return *this;
 }
 
-Vertexes& Vertexes::addVertex(float x, float y, float z, float w)
+Vertexes& Vertexes::add_vertex(float x, float y, float z, float w)
 {
-    mVertexes[mNext++] = x;
-    mVertexes[mNext++] = y;
-    mVertexes[mNext++] = z;
-    mVertexes[mNext++] = w;
+    m_vertexes[m_next++] = x;
+    m_vertexes[m_next++] = y;
+    m_vertexes[m_next++] = z;
+    m_vertexes[m_next++] = w;
     return *this;
 }
 
-Vertexes& Vertexes::addVertex(float x, float y, float z, float w,
-                              float tx, float ty)
+Vertexes& Vertexes::add_vertex(float x, float y, float z, float w,
+                               float tx, float ty)
 {
-    int j = mNext / mSizeOfPerVex * 2;
-    mVertexes[mNext++] = x;
-    mVertexes[mNext++] = y;
-    mVertexes[mNext++] = z;
-    mVertexes[mNext++] = w;
+    int j = m_next / m_size_of_per_vex * 2;
+    m_vertexes[m_next++] = x;
+    m_vertexes[m_next++] = y;
+    m_vertexes[m_next++] = z;
+    m_vertexes[m_next++] = w;
 
-    mTexCoords[j++] = tx;
-    mTexCoords[j] = ty;
+    m_tex_coords[j++] = tx;
+    m_tex_coords[j] = ty;
     return *this;
 }
 
-Vertexes& Vertexes::addVertex(gl_point &p)
+Vertexes& Vertexes::add_vertex(GLPoint &p)
 {
-    int j = mNext / mSizeOfPerVex * 2;
-    mVertexes[mNext++] = p.x;
-    mVertexes[mNext++] = p.y;
-    mVertexes[mNext++] = p.z;
+    int j = m_next / m_size_of_per_vex * 2;
+    m_vertexes[m_next++] = p.x;
+    m_vertexes[m_next++] = p.y;
+    m_vertexes[m_next++] = p.z;
 
-    mTexCoords[j++] = p.tx;
-    mTexCoords[j] = p.ty;
+    m_tex_coords[j++] = p.tex_x;
+    m_tex_coords[j] = p.tex_y;
     return *this;
 }
 
-void Vertexes::drawWith(GLenum type, GLint hVertexPos, GLint hTexCoord)
+void Vertexes::draw_with(GLenum type, GLint vertex_pos_loc, GLint tex_coord_loc)
 {
-    glVertexAttribPointer(hVertexPos, mSizeOfPerVex, GL_FLOAT, GL_FALSE, 0, mVertexes);
-    glEnableVertexAttribArray(hVertexPos);
+    glVertexAttribPointer(vertex_pos_loc, m_size_of_per_vex, GL_FLOAT,
+                          GL_FALSE, 0, m_vertexes);
+    glEnableVertexAttribArray(vertex_pos_loc);
 
-    glVertexAttribPointer(hTexCoord, 2, GL_FLOAT, GL_FALSE, 0, mTexCoords);
-    glEnableVertexAttribArray(hTexCoord);
+    glVertexAttribPointer(tex_coord_loc, 2, GL_FLOAT, GL_FALSE,
+                          0, m_tex_coords);
+    glEnableVertexAttribArray(tex_coord_loc);
 
     glDrawArrays(type, 0, count());
 }
 
-void Vertexes::drawWith(GLenum type, GLint hVertexPos, GLint hTexCoord,
-                        int offset, int length)
+void Vertexes::draw_with(GLenum type, GLint vertex_pos_loc, GLint tex_coord_loc,
+                         int offset, int length)
 {
-    glVertexAttribPointer(hVertexPos, mSizeOfPerVex, GL_FLOAT, GL_FALSE, 0, mVertexes);
-    glEnableVertexAttribArray(hVertexPos);
+    glVertexAttribPointer(vertex_pos_loc, m_size_of_per_vex, GL_FLOAT,
+                          GL_FALSE, 0, m_vertexes);
+    glEnableVertexAttribArray(vertex_pos_loc);
 
-    glVertexAttribPointer(hTexCoord, 2, GL_FLOAT, GL_FALSE, 0, mTexCoords);
-    glEnableVertexAttribArray(hTexCoord);
+    glVertexAttribPointer(tex_coord_loc, 2, GL_FLOAT, GL_FALSE,
+                          0, m_tex_coords);
+    glEnableVertexAttribArray(tex_coord_loc);
 
     glDrawArrays(type, offset, length);
 }

@@ -25,20 +25,22 @@
     x *= norm; y *= norm; z *= norm; \
 }
 
+/**
+ * Functions related Matrix. Copy from Android Matrix.java
+ */
 class Matrix {
 
 public:
-    static void orthoM(float m[16],
-                       float left, float right, float bottom, float top,
-                       float near, float far);
-    static void setIdentityM(float m[16]);
-    static void setLookAtM(float m[16],
-                           float eyeX, float eyeY, float eyeZ,
-                           float centerX, float centerY, float centerZ,
-                           float upX, float upY, float upZ);
-    static void multiplyMM(float m[16], float lhs[16], float rhs[16]);
-    static void translateM(float m[16], float x, float y, float z);
-
+    static void ortho(float *m,
+                      float left, float right, float bottom, float top,
+                      float near, float far);
+    static void set_identity(float *m);
+    static void set_look_at(float *m,
+                            float eye_x, float eye_y, float eye_z,
+                            float center_x, float center_y, float center_z,
+                            float up_x, float up_y, float up_z);
+    static void multiply_mm(float *m, float *lhs, float *rhs);
+    static void translate(float *m, float x, float y, float z);
 };
 
 

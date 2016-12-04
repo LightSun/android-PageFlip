@@ -17,68 +17,62 @@
 #ifndef ANDROID_PAGEFLIP_VERTEXES_H
 #define ANDROID_PAGEFLIP_VERTEXES_H
 
-
-#include "gl_point.h"
 #include <GLES2/gl2.h>
+#include "gl_point.h"
 
-class Vertexes
-{
-protected:
-    int mSizeOfPerVex;
-    int mCount;
-    int mCapacity;
-    int mNext;
-    float *mVertexes;
-    float *mTexCoords;
+class Vertexes {
 
 public:
     Vertexes();
-    Vertexes(int capacity, int sizeOfPerVex, bool hasTexture = false);
+    Vertexes(int capacity, int size_of_per_vex, bool has_texture = false);
     virtual ~Vertexes();
 
     void release();
-    int set(int capacity, int sizeOfPerVex, bool hasTexture = false);
-    Vertexes& addVertex(float x, float y, float z);
-    Vertexes& addVertex(float x, float y, float z, float w);
-    Vertexes& addVertex(float x, float y, float z, float tx, float ty);
-    Vertexes& addVertex(float x, float y, float z, float w, float tx, float ty);
-    Vertexes& addVertex(gl_point &p);
+    int set(int capacity, int size_of_per_vex, bool has_texture = false);
+    Vertexes& add_vertex(float x, float y, float z);
+    Vertexes& add_vertex(float x, float y, float z, float w);
+    Vertexes& add_vertex(float x, float y, float z, float tx, float ty);
+    Vertexes& add_vertex(float x, float y, float z, float w,
+                         float tx, float ty);
+    Vertexes& add_vertex(GLPoint &p);
 
-    void drawWith(GLenum type, GLint hVertexPos, GLint hTexCoord);
-    void drawWith(GLenum type, GLint hVertexPos, GLint hTexCoord, int offset, int length);
+    void draw_with(GLenum type, GLint vertex_pos_loc, GLint tex_coord_loc);
+    void draw_with(GLenum type, GLint vertex_pos_loc, GLint tex_coord_loc,
+                   int offset, int length);
 
     // inline
     inline int capacity()
     {
-        return mCapacity;
+        return m_capacity;
     };
 
     inline int count()
     {
-        return mCount;
+        return m_next / m_size_of_per_vex;
     }
 
-    inline int sizeOfPerVex()
+    inline int size_of_per_vex()
     {
-        return mSizeOfPerVex;
+        return m_size_of_per_vex;
     }
 
     inline void reset()
     {
-        mNext = 0;
+        m_next = 0;
     }
 
-    inline float getFloatAt(int index)
+    inline float float_at(int index)
     {
-        if (index >= 0 && index < mNext)
-        {
-            return mVertexes[index];
-        }
-
-        return 0;
+        return (index >= 0 && index < m_next) ? m_vertexes[index] : 0;
     }
 
-};
+protected:
+    int m_size_of_per_vex;
+    int m_capacity;
+    int m_next;
 
+    float *m_vertexes;
+    float *m_tex_coords;
+};
 
 #endif //ANDROID_PAGEFLIP_VERTEXES_H

@@ -18,6 +18,7 @@
 #define ANDROID_PAGEFLIP_GLPROGRAM_H
 
 #include <GLES2/gl2.h>
+#include "gl_shader.h"
 
 class GLShader;
 
@@ -27,13 +28,13 @@ public:
     GLProgram();
     virtual ~GLProgram();
 
-    virtual int init(const char* shader, const char* fragment);
+    virtual int init(const char* shader_glsl, const char* fragment_glsl);
     virtual void clean();
 
     // inline
-    inline int get_program_ref()
+    inline int program_ref()
     {
-        return program_ref;
+        return m_program_ref;
     }
 
 protected:
@@ -41,9 +42,9 @@ protected:
     virtual void get_vars_location() = 0;
 
 protected:
-    GLuint program_ref;
-    GLShader* shader;
-    GLShader* fragment;
+    GLuint m_program_ref;
+    GLShader m_shader;
+    GLShader m_fragment;
 };
 
 #endif //ANDROID_PAGEFLIP_GLPROGRAM_H

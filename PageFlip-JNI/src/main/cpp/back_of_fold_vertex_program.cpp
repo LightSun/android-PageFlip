@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-#include "BackOfFoldVertexProgram.h"
-#include "Constant.h"
+#include "back_of_fold_vertex_program.h"
+#include "constant.h"
 
-static const auto gVertexShader =
+static const auto g_vertex_shader =
         "uniform mat4 u_MVPMatrix;\n"
         "uniform float u_texXOffset;\n"
         "attribute vec4 a_vexPosition;\n"
@@ -32,7 +32,7 @@ static const auto gVertexShader =
         "    gl_Position = u_MVPMatrix * vertex;\n"
         "}";
 
-static const auto gFragmentShader =
+static const auto g_fragment_shader =
         "uniform sampler2D u_texture;\n"
         "uniform sampler2D u_shadow;\n"
         "uniform vec4 u_maskColor;\n"
@@ -48,9 +48,9 @@ static const auto gFragmentShader =
         "}";
 
 BackOfFoldVertexProgram::BackOfFoldVertexProgram()
-        : hShadow(Constant::kGlInValidLocation),
-          hMaskColor(Constant::kGlInValidLocation),
-          hTexXOffset(Constant::kGlInValidLocation)
+        : m_shadow_loc(Constant::kGlInValidLocation),
+          m_mask_color_loc(Constant::kGlInValidLocation),
+          m_tex_x_offset_loc(Constant::kGlInValidLocation)
 {
 }
 
@@ -61,21 +61,21 @@ BackOfFoldVertexProgram::~BackOfFoldVertexProgram()
 
 void BackOfFoldVertexProgram::clean()
 {
-    hShadow = Constant::kGlInValidLocation;
-    hMaskColor = Constant::kGlInValidLocation;
-    hTexXOffset = Constant::kGlInValidLocation;
+    m_shadow_loc = Constant::kGlInValidLocation;
+    m_mask_color_loc = Constant::kGlInValidLocation;
+    m_tex_x_offset_loc = Constant::kGlInValidLocation;
 
     GLProgram::clean();
 }
 
 int BackOfFoldVertexProgram::init()
 {
-    return GLProgram::(gVertexShader, gFragmentShader);
+    return GLProgram::(g_vertex_shader, g_fragment_shader);
 }
 
-void BackOfFoldVertexProgram::getVarsLocation()
+void BackOfFoldVertexProgram::get_vars_location()
 {
-    hShadow = glGetUniformLocation(hProgram, VAR_SHADOW_TEXTURE);
-    hMaskColor = glGetUniformLocation(hProgram, VAR_MASK_COLOR);
-    hTexXOffset = glGetUniformLocation(hProgram, VAR_TEXTURE_OFFSET);
+    m_shadow_loc = glGetUniformLocation(m_program_ref, VAR_SHADOW_TEXTURE);
+    m_mask_color_loc = glGetUniformLocation(m_program_ref, VAR_MASK_COLOR);
+    m_tex_x_offset_loc = glGetUniformLocation(m_program_ref, VAR_TEXTURE_OFFSET);
 }

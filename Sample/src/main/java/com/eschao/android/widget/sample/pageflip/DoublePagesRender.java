@@ -113,7 +113,7 @@ public class DoublePagesRender extends PageRender {
         }
 
         // 6. send message to main thread to notify drawing is ended so that
-        // we can continue to calculate next animation frame if need.
+        // we can continue to calculate m_next animation frame if need.
         // Remember: the drawing operation is always in GL thread instead of
         // main thread
         Message msg = Message.obtain();
@@ -167,9 +167,9 @@ public class DoublePagesRender extends PageRender {
             }
             // animation is finished
             else {
-                // should handle forward flip to update page number and exchange
+                // should handle m_forward flip to update page number and exchange
                 // textures between first and second pages. Don'top have to handle
-                // backward flip since there is no such state happened in double
+                // m_backward flip since there is no such state happened in double
                 // page mode
                 if (mPageFlip.getFlipState() == PageFlipState.END_WITH_FORWARD)
                 {
@@ -256,9 +256,9 @@ public class DoublePagesRender extends PageRender {
     }
 
     /**
-     * If page can flip forward
+     * If page can flip m_forward
      *
-     * @return true if it can flip forward
+     * @return true if it can flip m_forward
      */
     public boolean canFlipForward() {
         final Page page = mPageFlip.getFirstPage();
@@ -272,7 +272,7 @@ public class DoublePagesRender extends PageRender {
     }
 
     /**
-     * Don'top need to handle backward flip
+     * Don'top need to handle m_backward flip
      *
      * @return always false
      */

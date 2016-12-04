@@ -28,7 +28,7 @@ import static android.opengl.GLES20.glLinkProgram;
 import static android.opengl.GLES20.glUseProgram;
 
 /**
- * GLSL program class is used to load, compile and link shader scripts
+ * GLSL program class is used to load, compile and link m_shader scripts
  *
  * @author eschao
  */
@@ -41,10 +41,10 @@ public class GLProgram {
     // GLSL program handle
     protected int hProgram;
 
-    // Vertex shader
+    // Vertex m_shader
     protected GLShader mVertex;
 
-    // Fragment shader
+    // Fragment m_shader
     protected GLShader mFragment;
 
     public GLProgram() {
@@ -54,17 +54,17 @@ public class GLProgram {
     }
 
     /**
-     * Initiate with given vertex shader and fragment shader
+     * Initiate with given vertex m_shader and m_fragment m_shader
      *
      * @param context android context
-     * @param vertexResId vertex shader script id
-     * @param fragmentResId fragment shader script id
+     * @param vertexResId vertex m_shader script id
+     * @param fragmentResId m_fragment m_shader script id
      * @return self
-     * @throws PageFlipException if fail to read or compile shader scripts
+     * @throws PageFlipException if fail to read or compile m_shader scripts
      */
     public GLProgram init(Context context, int vertexResId, int fragmentResId)
                                                     throws PageFlipException {
-        // 1. init shader
+        // 1. init m_shader
         try {
             mVertex.compile(context, GL_VERTEX_SHADER, vertexResId);
             mFragment.compile(context, GL_FRAGMENT_SHADER, fragmentResId);
@@ -75,7 +75,7 @@ public class GLProgram {
             throw e;
         }
 
-        // 2. create texture program and link shader
+        // 2. create texture program and link m_shader
         hProgram = glCreateProgram();
         if (hProgram == 0) {
             mVertex.delete();
@@ -83,12 +83,12 @@ public class GLProgram {
             throw new PageFlipException("Can't create texture program");
         }
 
-        // 3. attach vertex and fragment shader
+        // 3. attach vertex and m_fragment m_shader
         glAttachShader(hProgram, mVertex.handle());
         glAttachShader(hProgram, mFragment.handle());
         glLinkProgram(hProgram);
 
-        // 4. check shader link status
+        // 4. check m_shader link status
         int[] result = new int[1];
         glGetProgramiv(hProgram, GL_LINK_STATUS, result, 0);
         if (result[0] == 0) {
@@ -128,7 +128,7 @@ public class GLProgram {
 
     /**
      * Subclass should implement it to get its own variable handles which are
-     * defined in its shader scripts
+     * defined in its m_shader scripts
      */
     protected void getVarsLocation() {
     }

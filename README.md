@@ -14,7 +14,7 @@ An Android library of 3D style page flip. It needs OpenGL 2.0!
      + [Area If Clicking To Flip](#3-area-of-clicking-to-flip)
      + [PageFlip Listener](#4-pageflip-listener)
      + [Mesh Pixels](#5-mesh-pixels)
-     + [Ratio Of Semi-peremeter](#6-ratio-of-semi-peremeter)
+     + [Ratio Of Semi-peremeter](#6-m_ratio-of-semi-peremeter)
      + [Mask Alpha For The Back Of Fold Page](#7-mask-alpha-for-the-back-of-fold-page)
      + [Edge Shadow Color/Alpha Of Fold Page](#8-edge-shadow-coloralpha-of-fold-page)
      + [Base Shadow Color/Alpha Of Fold Page](#9-base-shadow-coloralpha-of-fold-page)
@@ -71,7 +71,7 @@ More details, please take a look **PageFlipView** in sample application.
 
 ### II. Configure PageFlip
 
-**PageFlip** library provides some configurations for customizing its behaviors. For example: shadow color and alpha, mesh pixels and page mode. 
+**PageFlip** library provides some configurations for customizing its behaviors. For example: shadow color and alpha, mesh pixels and page mode.
 
 #### 1. Page Mode
 
@@ -101,17 +101,17 @@ You can use **enableAutoPage** to enable auto page mode or disable it(enable sin
   
 #### 3. Area of clicking to flip
   
-  You can give a ratio of width from 0 to 0.5f to set an area for reponsing click event to trigger a page flip. The default value is **0.5f**, which means the backfward flip will happen if you click the left half of screen and forward flip will start if you click the right half of screen in single page mode.
+  You can give a m_ratio of width from 0 to 0.5f to set an area for reponsing click event to trigger a page flip. The default value is **0.5f**, which means the backfward flip will happen if you click the left half of screen and m_forward flip will start if you click the right half of screen in single page mode.
   
   Example:
   ```java
-    // set ratio with 0.3
+    // set m_ratio with 0.3
     mPageFlip.setWidthRatioOfClickToFlip(0.3f);
   ```
 
 #### 4. PageFlip listener
 
-  You can set a listener to tell **PageFlip** if the forward flip or backward flip is allowed to be happened.
+  You can set a listener to tell **PageFlip** if the m_forward flip or m_backward flip is allowed to be happened.
    
   Example:
   ```java
@@ -129,7 +129,7 @@ You can use **enableAutoPage** to enable auto page mode or disable it(enable sin
   
 #### 6. Ratio of semi-peremeter
 
-  When page is curled, it is actually tackled as a semi-cylinder by **PageFlip**. You can set size of the semi-cylinder to change the flip shap. Since the semi-cylinder dependeds on the line length from the touch point to original point(see the below illustration), you need to provide a ratio of this line length to tell **PageFlip** the peremeter of the semi-cylinder. The default value is 0.8f.
+  When page is curled, it is actually tackled as a semi-cylinder by **PageFlip**. You can set size of the semi-cylinder to change the flip shap. Since the semi-cylinder dependeds on the line length from the touch point to original point(see the below illustration), you need to provide a m_ratio of this line length to tell **PageFlip** the peremeter of the semi-cylinder. The default value is 0.8f.
   
   ```
     +----------------+
@@ -144,7 +144,7 @@ You can use **enableAutoPage** to enable auto page mode or disable it(enable sin
     +----------------+
                 original point, that means you drag the page from here to touch point(touchP)
   
-    The length from p0 to p1 is peremeter of semi-cylinder and determined by ratio your giving
+    The length from p0 to p1 is peremeter of semi-cylinder and determined by m_ratio your giving
   ```
   
   Example:
@@ -188,7 +188,7 @@ You can use **enableAutoPage** to enable auto page mode or disable it(enable sin
   Example:
   ```java
     // set the minimal width is 5 pixels and maximum width is 40 pixels.
-    // set the ratio is 0.3f which means the width will be firstly computed by formula: 
+    // set the m_ratio is 0.3f which means the width will be firstly computed by formula:
     // width = diameter of semi-cylinder * 0.3f, and then compare it with minimal
     // and maximal value to make sure the width is in range.
     mPageFlip.setShadowWidthOfFoldEdges(5, 40, 0.3f);

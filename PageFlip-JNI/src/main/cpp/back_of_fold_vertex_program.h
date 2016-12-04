@@ -17,18 +17,9 @@
 #ifndef ANDROID_PAGEFLIP_BACKOFFOLDVERTEXPROGRAM_H
 #define ANDROID_PAGEFLIP_BACKOFFOLDVERTEXPROGRAM_H
 
-#include "VertexProgram.h"
+#include "vertex_program.h"
 
-class BackOfFoldVertexProgram : public VertexProgram
-{
-protected:
-    static const char *VAR_TEXTURE_OFFSET   = "u_texXOffset";
-    static const char *VAR_MASK_COLOR       = "u_maskColor";
-    static const char *VAR_SHADOW_TEXTURE   = "u_shadow";
-
-    GLint hShadow;
-    GLint hMaskColor;
-    GLint hTexXOffset;
+class BackOfFoldVertexProgram : public VertexProgram {
 
 public:
     BackOfFoldVertexProgram();
@@ -38,23 +29,32 @@ public:
     int init();
 
     // inline
-    inline GLint getShadowLoc()
+    inline GLint get_shadow_loc()
     {
-        return hShadow;
+        return m_shadow_loc;
     }
 
-    inline GLint getMaskColorLoc()
+    inline GLint get_mask_color_loc()
     {
-        return hMaskColor;
+        return m_mask_color_loc;
     }
 
-    inline GLint getTexXOffsetLoc()
+    inline GLint get_tex_x_offset_loc()
     {
-        return hTexXOffset;
+        return m_tex_x_offset_loc;
     }
 
 protected:
-    void getVarsLocation();
+    void get_vars_location();
+
+protected:
+    static const char *VAR_TEXTURE_OFFSET   = "u_texXOffset";
+    static const char *VAR_MASK_COLOR       = "u_maskColor";
+    static const char *VAR_SHADOW_TEXTURE   = "u_shadow";
+
+    GLint m_shadow_loc;
+    GLint m_mask_color_loc;
+    GLint m_tex_x_offset_loc;
 };
 
 #endif //ANDROID_PAGEFLIP_BACKOFFOLDVERTEXPROGRAM_H

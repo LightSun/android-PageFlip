@@ -22,7 +22,7 @@ import static android.opengl.GLES20.glGetAttribLocation;
 import static android.opengl.GLES20.glGetUniformLocation;
 
 /**
- * Vertex shader program which is used to load:
+ * Vertex m_shader program which is used to load:
  * <ul>
  *     <li>vertex_shader.glsl</li>
  *     <li>fragment_shader.glsl</li>
@@ -43,7 +43,7 @@ class VertexProgram extends GLProgram {
     // universal model-view-project matrix
     final static float[] MVPMatrix = new float[16];
 
-    // variable handles after compiled & linked shader scripts
+    // variable handles after compiled & linked m_shader scripts
     int hMVPMatrix;
     int hVertexPosition;
     int hTextureCoord;
@@ -60,7 +60,7 @@ class VertexProgram extends GLProgram {
     }
 
     /**
-     * Initiate vertex shader program
+     * Initiate vertex m_shader program
      *
      * @param context Android app context
      * @return self object
@@ -72,7 +72,7 @@ class VertexProgram extends GLProgram {
     }
 
     /**
-     * Get variable handles after linked shader program
+     * Get variable handles after linked m_shader program
      */
     protected void getVarsLocation() {
         if (hProgram != 0) {
@@ -84,7 +84,7 @@ class VertexProgram extends GLProgram {
     }
 
     /**
-     * Delete shader and program handlers
+     * Delete m_shader and program handlers
      */
     public void delete() {
         super.delete();

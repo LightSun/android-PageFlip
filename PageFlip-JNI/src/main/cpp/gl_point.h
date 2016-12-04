@@ -21,8 +21,12 @@
  * OpenGL point includes (x, y, z) coordinate in 3D system and corresponding texture coordinate
  * (x, y)
  */
-class GLPoint {
+struct GLPoint {
+
 public:
+    GLPoint() : x(0), y(0), z(0), tex_x(0), tex_y(0)
+    { }
+
     GLPoint(float x, float y, float z, float tex_x, float tex_y)
             : x(x), y(y), z(z), tex_x(tex_x), tex_y(tex_y)
     { }

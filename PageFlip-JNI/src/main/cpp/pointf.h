@@ -14,14 +14,23 @@
  * limitations under the License.
  */
 
-#ifndef ANDROID_PAGEFLIP_CONSTANT_H
-#define ANDROID_PAGEFLIP_CONSTANT_H
+#ifndef ANDROID_PAGEFLIP_POINTF_H
+#define ANDROID_PAGEFLIP_POINTF_H
 
-class Constant {
+struct PointF {
+    float x;
+    float y;
 
-public:
-    static const int kGlInvalidRef = 0;
-    static const int kGlInValidLocation = -1;
+    PointF() : x(0), y(0)
+    { }
+
+    PointF(float x, float y) : x(x), y(y)
+    { }
+
+    inline void set(float x, float y)
+    {
+        this->x = x;
+        this->y = y;
+    }
 };
-
-#endif //ANDROID_PAGEFLIP_CONSTANT_H
+#endif //ANDROID_PAGEFLIP_POINTF_H

@@ -32,7 +32,7 @@ import static android.opengl.GLES20.glGetShaderiv;
 import static android.opengl.GLES20.glShaderSource;
 
 /**
- * GLSL shader class is used to load and compile shader script
+ * GLSL m_shader class is used to load and compile m_shader script
  *
  * @author eschao
  */
@@ -41,7 +41,7 @@ public class GLShader {
 
     private final static String TAG = "GLShader";
 
-    // shader handle
+    // m_shader handle
     int hShader;
 
     /**
@@ -52,47 +52,47 @@ public class GLShader {
     }
 
     /**
-     * Read shader script from resources and compile
+     * Read m_shader script from resources and compile
      *
      * @param context android context
      * @param type  GL_VERTEX_SHADER or GL_FRAGMENT_SHADER
      * @param resId script resource id
      * @return self
-     * @throws PageFlipException if fail to compile shader script
+     * @throws PageFlipException if fail to compile m_shader script
      */
     public GLShader compile(Context context, int type, int resId)
                                                     throws PageFlipException {
-        // read shader scripts from resource
+        // read m_shader scripts from resource
         String codes = readGLSLFromResource(context, resId);
         if (codes.length() < 1) {
-            throw new PageFlipException("Empty GLSL shader for resource id:"
+            throw new PageFlipException("Empty GLSL m_shader for resource id:"
                                         + resId);
         }
 
-        // create a shader
+        // create a m_shader
         hShader = glCreateShader(type);
         if (hShader != 0) {
-            // upload shader scripts to GL
+            // upload m_shader scripts to GL
             glShaderSource(hShader, codes);
 
-            // compile shader scripts
+            // compile m_shader scripts
             glCompileShader(hShader);
 
             // get compile results to check if it is successful
             final int[] result = new int[1];
             glGetShaderiv(hShader, GL_COMPILE_STATUS, result, 0);
             if (result[0] == 0) {
-                // delete shader if compile is failed
-                Log.e(TAG, "Can'top compile shader for type: " + type +
+                // delete m_shader if compile is failed
+                Log.e(TAG, "Can'top compile m_shader for type: " + type +
                            "Error: " + glGetError());
-                Log.e(TAG, "Compile shader error: " +
+                Log.e(TAG, "Compile m_shader error: " +
                            glGetShaderInfoLog(hShader));
                 glDeleteShader(hShader);
-                throw new PageFlipException("Can't compile shader for" +
+                throw new PageFlipException("Can't compile m_shader for" +
                                             "type: " + type);
             }
         } else {
-            throw new PageFlipException("Can't create shader. Error: " +
+            throw new PageFlipException("Can't create m_shader. Error: " +
                                         glGetError());
         }
 
@@ -100,7 +100,7 @@ public class GLShader {
     }
 
     /**
-     * Delete shader
+     * Delete m_shader
      */
     public void delete() {
         if (hShader != 0) {
@@ -110,20 +110,20 @@ public class GLShader {
     }
 
     /**
-     * Get shader handle
+     * Get m_shader handle
      *
-     * @return shader handle
+     * @return m_shader handle
      */
     public int handle() {
         return hShader;
     }
 
     /**
-     * Read shader script from resources
+     * Read m_shader script from resources
      *
      * @param context android context
      * @param resId script resource id
-     * @return shader script contents
+     * @return m_shader script contents
      * @throws PageFlipException if fail to read script from resources
      */
     String readGLSLFromResource(Context context, int resId) throws

@@ -18,9 +18,9 @@
 
 #define I(_i, _j) ((_j)+((_i)<<2))
 
-static void Matrix::orthoM(float *m,
-                           float left, float right, float bottom, float top,
-                           float near, float far)
+static void Matrix::ortho(float *m,
+                          float left, float right, float bottom, float top,
+                          float near, float far)
 {
     float r_width  = 1.0f / (right - left);
     float r_height = 1.0f / (top - bottom);
@@ -50,7 +50,7 @@ static void Matrix::orthoM(float *m,
     m[11] = 0.0f;
 }
 
-static void Matrix::setIdentityM(float *m)
+static void Matrix::set_identity(float *m)
 {
     for (int i = 0; i < 16; ++i) {
         m[i] = 0;
@@ -61,19 +61,19 @@ static void Matrix::setIdentityM(float *m)
     }
 }
 
-static void Matrix::setLookAtM(float *m,
-                               float eyeX, float eyeY, float eyeZ,
-                               float centerX, float centerY, float centerZ,
-                               float upX, float upY, float upZ)
+static void Matrix::set_look_at(float *m,
+                                float eye_x, float eye_y, float eye_z,
+                                float center_x, float center_y, float center_z,
+                                float up_x, float up_y, float up_z)
 {
-    float fx = centerX - eyeX;
-    float fy = centerY - eyeY;
-    float fz = centerZ - eyeZ;
+    float fx = center_x - eye_x;
+    float fy = center_y - eye_y;
+    float fz = center_z - eye_z;
     normalize(fx, fy, fz);
 
-    float sx = fy * upZ - fz * upY;
-    float sy = fz * upX - fx * upZ;
-    float sz = fx * upY - fy * upX;
+    float sx = fy * up_z - fz * up_y;
+    float sy = fz * up_x - fx * up_z;
+    float sz = fx * up_y - fy * up_x;
     normalize(sx, sy, sz);
 
     float ux = sy * fz - sz * fy;
@@ -100,28 +100,25 @@ static void Matrix::setLookAtM(float *m,
     m[14] = 0.0f;
     m[15] = 1.0f;
 
-    translateM(m, -eyeX, -eyeY, -eyeZ);
+    translate(m, -eye_x, -eye_y, -eye_z);
 }
 
-static void Matrix::translateM(float *m, float x, float y, float z) {
-    for (int i = 0 ; i < 4 ; ++i)
-    {
+static void Matrix::translate(float *m, float x, float y, float z) {
+    for (int i = 0 ; i < 4 ; ++i) {
         m[12 + i] += m[i] * x + m[4 + i] * y + m[8 + i] * z;
     }
 }
 
-static void Matrix::multiplyMM(float *m, float *lhs, float *rhs)
+static void Matrix::multiply_mm(float *m, float *lhs, float *rhs)
 {
-    for (int i = 0; i < 4; i++)
-    {
+    for (int i = 0; i < 4; i++) {
         register const float rhs_i0 = rhs[I(i, 0)];
         register float ri0 = lhs[ I(0,0) ] * rhs_i0;
         register float ri1 = lhs[ I(0,1) ] * rhs_i0;
         register float ri2 = lhs[ I(0,2) ] * rhs_i0;
         register float ri3 = lhs[ I(0,3) ] * rhs_i0;
 
-        for (int j = 1; j < 4; j++)
-        {
+        for (int j = 1; j < 4; j++) {
             register const float rhs_ij = rhs[ I(i,j) ];
             ri0 += lhs[ I(j,0) ] * rhs_ij;
             ri1 += lhs[ I(j,1) ] * rhs_ij;

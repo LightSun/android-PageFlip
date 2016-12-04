@@ -23,7 +23,7 @@ GLViewRect::GLViewRect()
 { }
 
 GLViewRect::GLViewRect() (float surface_width, float surface_height,
-           float margin_left, float margin_right)
+                          float margin_left, float margin_right)
 {
     set(surface_width, surface_height, margin_left, margin_right);
 }

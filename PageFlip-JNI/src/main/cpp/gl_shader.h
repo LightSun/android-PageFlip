@@ -25,17 +25,17 @@ public:
     GLShader();
     ~GLShader();
 
-    int load(GLenum type, const char* shader);
+    int load(GLenum type, const char* shader_glsl);
     void clean();
 
     // inline
-    inline GLuint get_shader_ref()
+    inline GLuint shader_ref()
     {
-        return shader_ref;
+        return m_shader_ref;
     }
 
 protected:
-    GLuint shader_ref;
+    GLuint m_shader_ref;
 
 };
 

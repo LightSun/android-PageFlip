@@ -18,53 +18,68 @@
 #define ANDROID_PAGEFLIP_SHADOWVERTEXES_H
 
 
-#include "ShadowColor.h"
+#include "shadow_color.h"
 
 class ShadowVertexProgram;
 
 class ShadowVertexes {
 
-protected:
-    int mCount;
-    int mCapacity;
-    int mSpaceOfFrontRear;
-    int mBackward;
-    int mForward;
-    int mMaxBackward;
-
-    float mVertexZ;
-    float *mVertexes;
-    ShadowColor mColor;
-
 public:
-    ShadowVertexes(int spaceOfFrontRear,
-                   float startColor, float startAlpha,
-                   float endColor, float endAlpha);
+    ShadowVertexes(int space_of_front_rear,
+                   float start_color, float start_alpha,
+                   float end_color, float end_alpha);
     ~ShadowVertexes();
 
     void release();
     void set(int capacity);
-    ShadowVertexes& setVertexes(int offset, float startX, float startY, float endX, float endY);
-    ShadowVertexes& addVertexesBackward(float startX, float startY, float endX, float endY);
-    ShadowVertexes& addVertexesForward(float startX, float startY, float endX, float endY);
+    ShadowVertexes& set_vertexes(int offset,
+                                 float start_x, float start_y,
+                                 float end_x, float end_y);
+    ShadowVertexes& add_vertexes_backward(float start_x, float start_y,
+                                          float end_x, float end_y);
+    ShadowVertexes& add_vertexes_forward(float start_x, float start_y,
+                                         float end_x, float end_y);
     void draw(ShadowVertexProgram& program);
 
     // inline
     inline void reset()
     {
-        mVertexZ = 0;
-        mBackward = mMaxBackward;
-        mForward = mMaxBackward + (mSpaceOfFrontRear << 2);
+        m_vertex_z = 0;
+        m_backward = m_max_backward;
+        m_forward = m_max_backward + (m_space_of_front_rear << 2);
     }
 
-    inline ShadowVertexes& addVertexes(bool isForward,
-                                       float startX, float startY,
-                                       float endX, float endY)
+    inline int max_backward()
     {
-        return isForward ?
-               addVertexesForward(startX, startY, endX, endY) :
-               addVertexesBackward(startX, startY, endX, endY);
+        return m_max_backward;
     }
+
+    inline void set_vertex_z(float z)
+    {
+        m_vertex_z = z;
+    }
+
+    inline ShadowVertexes& add_vertexes(bool is_forward,
+                                        float start_x, float start_y,
+                                        float end_x, float end_y)
+    {
+        return is_forward ?
+               add_vertexes_forward(start_x, start_y, end_x, end_y) :
+               add_vertexes_backward(start_x, start_y, end_x, end_y);
+    }
+
+public:
+    ShadowColor color;
+
+protected:
+    int m_capacity;
+    int m_space_of_front_rear;
+    int m_backward;
+    int m_forward;
+    int m_max_backward;
+
+    float m_vertex_z;
+    float *m_vertexes;
 };
 
 

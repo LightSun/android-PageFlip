@@ -36,7 +36,7 @@ import com.eschao.android.widget.pageflip.PageFlipState;
  *     <li>First texture: current page content</li>
  *     <li>Back texture: back of front content, it is same with first texture
  *     </li>
- *     <li>Second texture: next page content</li>
+ *     <li>Second texture: m_next page content</li>
  * </ul>
  * </p>
  *
@@ -65,7 +65,7 @@ public class SinglePageRender extends PageRender {
         // 2. handle drawing command triggered from finger moving and animating
         if (mDrawCommand == DRAW_MOVING_FRAME ||
             mDrawCommand == DRAW_ANIMATING_FRAME) {
-            // is forward flip
+            // is m_forward flip
             if (mPageFlip.getFlipState() == PageFlipState.FORWARD_FLIP) {
                 // check if second texture of first page is valid, if not,
                 // create new one
@@ -74,7 +74,7 @@ public class SinglePageRender extends PageRender {
                     page.setSecondTexture(mBitmap);
                 }
             }
-            // in backward flip, check first texture of first page is valid
+            // in m_backward flip, check first texture of first page is valid
             else if (!page.isFirstTextureSet()) {
                 drawPage(--mPageNo);
                 page.setFirstTexture(mBitmap);
@@ -94,7 +94,7 @@ public class SinglePageRender extends PageRender {
         }
 
         // 3. send message to main thread to notify drawing is ended so that
-        // we can continue to calculate next animation frame if need.
+        // we can continue to calculate m_next animation frame if need.
         // Remember: the drawing operation is always in GL thread instead of
         // main thread
         Message msg = Message.obtain();
@@ -148,12 +148,12 @@ public class SinglePageRender extends PageRender {
             // animation is finished
             else {
                 final PageFlipState state = mPageFlip.getFlipState();
-                // update page number for backward flip
+                // update page number for m_backward flip
                 if (state == PageFlipState.END_WITH_BACKWARD) {
                     // don't do anything on page number since mPageNo is always
                     // represents the FIRST_TEXTURE no;
                 }
-                // update page number and switch textures for forward flip
+                // update page number and switch textures for m_forward flip
                 else if (state == PageFlipState.END_WITH_FORWARD) {
                     mPageFlip.getFirstPage().setFirstTextureWithSecond();
                     mPageNo++;
@@ -213,9 +213,9 @@ public class SinglePageRender extends PageRender {
     }
 
     /**
-     * If page can flip forward
+     * If page can flip m_forward
      *
-     * @return true if it can flip forward
+     * @return true if it can flip m_forward
      */
     public boolean canFlipForward() {
         return (mPageNo < MAX_PAGES);
@@ -233,9 +233,9 @@ public class SinglePageRender extends PageRender {
     }
 
     /**
-     * If page can flip backward
+     * If page can flip m_backward
      *
-     * @return true if it can flip backward
+     * @return true if it can flip m_backward
      */
     public boolean canFlipBackward() {
         if (mPageNo > 1) {

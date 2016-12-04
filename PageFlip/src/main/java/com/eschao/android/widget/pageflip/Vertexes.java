@@ -36,7 +36,7 @@ class Vertexes {
 
     private static final String TAG = "Vertexes";
 
-    // how many vertexes in vertex float buffer will be drawn on screen
+    // how many m_vertexes in vertex float buffer will be drawn on screen
     int mVertexesSize;
 
     // how many float data is used for every vertex
@@ -48,11 +48,11 @@ class Vertexes {
     // texture coordinates array
     float[] mTextureCoords;
 
-    // float buffer for vertexes data and texture coordinates data
+    // float buffer for m_vertexes data and texture coordinates data
     FloatBuffer mVertexesBuf;
     FloatBuffer mTextureCoordsBuf;
 
-    // next index when add vertex to float array
+    // m_next index when add vertex to float array
     int mNext;
 
 
@@ -112,7 +112,7 @@ class Vertexes {
         mTextureCoords = null;
         mTextureCoordsBuf = null;
 
-        // create vertexes buffer
+        // create m_vertexes buffer
         mSizeOfPerVex = sizeOfPerVex;
         mVertexes = new float[capacity * sizeOfPerVex];
         mVertexesBuf = ByteBuffer.allocateDirect(capacity * sizeOfPerVex * 4)
@@ -202,7 +202,7 @@ class Vertexes {
      * @param x x value of vertex coordinate
      * @param y y value of vertex coordinate
      * @param z z value of vertex coordinate
-     * @param w width value which is normally used to pass other value to shader
+     * @param w width value which is normally used to pass other value to m_shader
      * @return self
      */
     public Vertexes setVertex(int i, float x, float y, float z, float w) {
@@ -274,7 +274,7 @@ class Vertexes {
      * @param x x value of vertex coordinate
      * @param y y value of vertex coordinate
      * @param z z value of vertex coordinate
-     * @param w width value which is normally used to pass other value to shader
+     * @param w width value which is normally used to pass other value to m_shader
      * @return self
      */
     public Vertexes addVertex(float x, float y, float z, float w) {
@@ -291,7 +291,7 @@ class Vertexes {
      * @param x x value of vertex coordinate
      * @param y y value of vertex coordinate
      * @param z z value of vertex coordinate
-     * @param w width value which is normally used to pass other value to shader
+     * @param w width value which is normally used to pass other value to m_shader
      * @param coordX x value of texture coordinate
      * @param coordY y value of texture coordinate
      * @return self
@@ -349,7 +349,7 @@ class Vertexes {
     /**
      * Put all data from float array to float buffer
      * <p>
-     * The offset is 0 and the length is determined by mNext which is increased
+     * The offset is 0 and the length is determined by m_next which is increased
      * after calling {@link #addVertex}
      * </p>
      *
@@ -367,11 +367,11 @@ class Vertexes {
     }
 
     /**
-     * Draw vertexes
+     * Draw m_vertexes
      *
      * @param type openGL drawing type: TRIANGLE, STRIP, FAN
-     * @param hVertexPos vertex handle in shader program
-     * @param hTextureCoord texture handle in shader program
+     * @param hVertexPos vertex handle in m_shader program
+     * @param hTextureCoord texture handle in m_shader program
      */
     public void drawWith(int type, int hVertexPos, int hTextureCoord) {
         // pass vertex data
@@ -389,11 +389,11 @@ class Vertexes {
     }
 
     /**
-     * Draw vertexes with given offset and length
+     * Draw m_vertexes with given offset and length
      *
      * @param type openGL drawing type: TRIANGLE, STRIP, FAN
-     * @param hVertexPos vertex handle in shader program
-     * @param hTextureCoord texture handle in shader program
+     * @param hVertexPos vertex handle in m_shader program
+     * @param hTextureCoord texture handle in m_shader program
      * @param offset vertex start offset in buffer
      * @param length vertex length to be drawn
      */

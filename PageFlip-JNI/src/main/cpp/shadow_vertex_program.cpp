@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-#include "ShadowVertexProgram.h"
-#include "Constant.h"
+#include "shadow_vertex_program.h"
+#include "constant.h"
 
-static const auto gVertexShader =
+static const auto g_vertex_shader =
         "uniform mat4 u_MVPMatrix;\n"
         "uniform float u_vexZ;\n"
         "attribute vec4 a_vexPosition;\n"
@@ -29,7 +29,7 @@ static const auto gVertexShader =
         "    gl_Position = u_MVPMatrix * vexPos;\n"
         "}";
 
-static const auto gFragmentShader =
+static const auto g_fragment_shader =
         "varying vec4 v_texColor;\n"
         "\n"
         "void main()\n"
@@ -38,9 +38,9 @@ static const auto gFragmentShader =
         "}";
 
 ShadowVertexProgram::ShadowVertexProgram()
-        : hMVPMatrix(Constant::kGlInValidLocation),
-          hVertexZ(Constant::kGlInValidLocation),
-          hVertexPosition(Constant::kGlInValidLocation)
+        : m_mvp_matrix_loc(Constant::kGlInValidLocation),
+          m_vertex_z_loc(Constant::kGlInValidLocation),
+          m_vertex_pos_loc(Constant::kGlInValidLocation)
 {
 }
 
@@ -51,21 +51,21 @@ ShadowVertexProgram::~ShadowVertexProgram()
 
 void ShadowVertexProgram::clean()
 {
-    hMVPMatrix = Constant::kGlInValidLocation;
-    hVertexZ = Constant::kGlInValidLocation;
-    hVertexPosition = Constant::kGlInValidLocation;
+    m_mvp_matrix_loc = Constant::kGlInValidLocation;
+    m_vertex_z_loc = Constant::kGlInValidLocation;
+    m_vertex_pos_loc = Constant::kGlInValidLocation;
 
     GLProgram::clean();
 }
 
 int ShadowVertexProgram::init()
 {
-    return GLProgram::init(gVertexShader, gFragmentShader);
+    return GLProgram::init(g_vertex_shader, g_fragment_shader);
 }
 
-void ShadowVertexProgram::getVarsLocation()
+void ShadowVertexProgram::get_vars_location()
 {
-    hVertexZ = glGetUniformLocation(hProgram, VAR_VERTEX_Z);
-    hMVPMatrix = glGetAttribLocation(hProgram, VAR_VERTEX_POS);
-    hVertexPosition = glGetUniformLocation(hProgram, VAR_VERTEX_POS);
+    m_vertex_z_loc = glGetUniformLocation(m_program_ref, VAR_VERTEX_Z);
+    m_mvp_matrix_loc = glGetUniformLocation(m_program_ref, VAR_MVP_MATRIX);
+    m_vertex_pos_loc = glGetAttribLocation(m_program_ref, VAR_VERTEX_POS);
 }
