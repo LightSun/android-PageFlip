@@ -16,15 +16,16 @@
 
 #include "Matrix.h"
 
+namespace eschao {
+
 #define I(_i, _j) ((_j)+((_i)<<2))
 
 static void Matrix::ortho(float *m,
                           float left, float right, float bottom, float top,
-                          float near, float far)
-{
-    float r_width  = 1.0f / (right - left);
+                          float near, float far) {
+    float r_width = 1.0f / (right - left);
     float r_height = 1.0f / (top - bottom);
-    float r_depth  = 1.0f / (far - near);
+    float r_depth = 1.0f / (far - near);
 
     float x = 2.0f * r_width;
     float y = 2.0f * r_height;
@@ -50,8 +51,7 @@ static void Matrix::ortho(float *m,
     m[11] = 0.0f;
 }
 
-static void Matrix::set_identity(float *m)
-{
+static void Matrix::set_identity(float *m) {
     for (int i = 0; i < 16; ++i) {
         m[i] = 0;
     }
@@ -64,8 +64,7 @@ static void Matrix::set_identity(float *m)
 static void Matrix::set_look_at(float *m,
                                 float eye_x, float eye_y, float eye_z,
                                 float center_x, float center_y, float center_z,
-                                float up_x, float up_y, float up_z)
-{
+                                float up_x, float up_y, float up_z) {
     float fx = center_x - eye_x;
     float fy = center_y - eye_y;
     float fz = center_z - eye_z;
@@ -104,31 +103,32 @@ static void Matrix::set_look_at(float *m,
 }
 
 static void Matrix::translate(float *m, float x, float y, float z) {
-    for (int i = 0 ; i < 4 ; ++i) {
+    for (int i = 0; i < 4; ++i) {
         m[12 + i] += m[i] * x + m[4 + i] * y + m[8 + i] * z;
     }
 }
 
-static void Matrix::multiply_mm(float *m, float *lhs, float *rhs)
-{
+static void Matrix::multiply_mm(float *m, float *lhs, float *rhs) {
     for (int i = 0; i < 4; i++) {
         register const float rhs_i0 = rhs[I(i, 0)];
-        register float ri0 = lhs[ I(0,0) ] * rhs_i0;
-        register float ri1 = lhs[ I(0,1) ] * rhs_i0;
-        register float ri2 = lhs[ I(0,2) ] * rhs_i0;
-        register float ri3 = lhs[ I(0,3) ] * rhs_i0;
+        register float ri0 = lhs[I(0, 0)] * rhs_i0;
+        register float ri1 = lhs[I(0, 1)] * rhs_i0;
+        register float ri2 = lhs[I(0, 2)] * rhs_i0;
+        register float ri3 = lhs[I(0, 3)] * rhs_i0;
 
         for (int j = 1; j < 4; j++) {
-            register const float rhs_ij = rhs[ I(i,j) ];
-            ri0 += lhs[ I(j,0) ] * rhs_ij;
-            ri1 += lhs[ I(j,1) ] * rhs_ij;
-            ri2 += lhs[ I(j,2) ] * rhs_ij;
-            ri3 += lhs[ I(j,3) ] * rhs_ij;
+            register const float rhs_ij = rhs[I(i, j)];
+            ri0 += lhs[I(j, 0)] * rhs_ij;
+            ri1 += lhs[I(j, 1)] * rhs_ij;
+            ri2 += lhs[I(j, 2)] * rhs_ij;
+            ri3 += lhs[I(j, 3)] * rhs_ij;
         }
 
-        m[ I(i,0) ] = ri0;
-        m[ I(i,1) ] = ri1;
-        m[ I(i,2) ] = ri2;
-        m[ I(i,3) ] = ri3;
+        m[I(i, 0)] = ri0;
+        m[I(i, 1)] = ri1;
+        m[I(i, 2)] = ri2;
+        m[I(i, 3)] = ri3;
     }
+}
+
 }

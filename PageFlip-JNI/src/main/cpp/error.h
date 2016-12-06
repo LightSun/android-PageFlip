@@ -17,6 +17,8 @@
 #ifndef ANDROID_PAGEFLIP_ERROR_H
 #define ANDROID_PAGEFLIP_ERROR_H
 
+namespace eschao {
+
 #define MAX_DESC_LENGTH 1023
 
 enum Error {
@@ -36,4 +38,5 @@ extern char err_desc[MAX_DESC_LENGTH + 1];
 
 extern int check_err_desc_len(int lne);
 
+}
 #endif //ANDROID_PAGEFLIP_ERROR_H

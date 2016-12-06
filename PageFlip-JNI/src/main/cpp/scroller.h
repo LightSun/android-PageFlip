@@ -22,32 +22,31 @@
 
 #define DEFAULT_DURATION 250
 
+namespace eschao {
+
 class Interpolator {
 
 public:
-    virtual ~Interpolator();
+    virtual ~Interpolator() { };
 
     virtual float interpolate(float input) = 0;
 
 protected:
-    Interpolator()
-    { }
+    Interpolator() { }
 };
 
 class AccelerateInterpolator : public Interpolator {
 
 public:
-    explicit AccelerateInterpolator(float factor)
-            : m_factor(factor), m_double_factor(factor * 2)
-    { }
+    explicit AccelerateInterpolator(float factor = 1.0f)
+            : m_factor(factor), m_double_factor(factor * 2) { }
 
-    virtual float interpolate(float input) override
-    {
+    virtual float interpolate(float input) override {
         if (m_factor == 1.0f) {
             return input * input;
         }
         else {
-            return (float)pow(input, m_double_factor);
+            return (float) pow(input, m_double_factor);
         }
     }
 
@@ -59,8 +58,7 @@ private:
 class LinearInterpolator : public Interpolator {
 
 public:
-    virtual float interpolate(float input) override
-    {
+    virtual float interpolate(float input) override {
         return input;
     }
 };
@@ -73,80 +71,72 @@ class Scroller {
 
 public:
     Scroller();
+
     Scroller(Interpolator *interpolator);
+
     ~Scroller();
 
     bool compute_scroll_offset();
+
     void start_scroll(float start_x, float start_y, float dx, float dy,
                       int duration = DEFAULT_DURATION);
 
-    inline void set_interpolator(Interpolator *interpolator)
-    {
+    inline void set_interpolator(Interpolator *interpolator) {
         if (m_interpolator) {
             delete m_interpolator;
         }
         m_interpolator = interpolator;
     }
 
-    inline bool is_finished()
-    {
+    inline bool is_finished() {
         return m_finished;
     }
 
-    inline void set_finished(bool finished)
-    {
+    inline void set_finished(bool finished) {
         m_finished = finished;
     }
 
-    inline int duration()
-    {
+    inline int duration() {
         return m_duration;
     }
 
-    inline float curr_x()
-    {
+    inline float curr_x() {
         return m_curr_x;
     }
 
-    inline float curr_y()
-    {
+    inline float curr_y() {
         return m_curr_y;
     }
 
-    inline float start_x()
-    {
+    inline float start_x() {
         return m_start_x;
     }
 
-    inline float start_y()
-    {
+    inline float start_y() {
         return m_start_y;
     }
 
-    inline float final_x()
-    {
+    inline float final_x() {
         return m_final_x;
     }
 
-    inline float final_y()
-    {
+    inline float final_y() {
         return m_final_y;
     }
 
-    inline void abortAnimation()
-    {
+    inline void abortAnimation() {
         m_curr_x = m_final_x;
         m_curr_y = m_final_y;
         m_finished = true;
     }
 
 private:
-    inline long get_system_clock()
-    {
+    inline long get_system_clock() {
         return clock() / CLOCKS_PER_SEC * 1000;
     }
+
 private:
-    Interpolator* m_interpolator;
+    Interpolator *m_interpolator;
 
     float m_start_x;
     float m_start_y;
@@ -162,5 +152,5 @@ private:
     bool m_finished;
 };
 
-
+}
 #endif //ANDROID_PAGEFLIP_SCROLLER_H

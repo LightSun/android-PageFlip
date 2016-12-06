@@ -17,25 +17,24 @@
 #include "gl_shader.h"
 #include "constant.h"
 #include "error.h"
+#include "pageflip_exception.h"
+
+namespace eschao {
 
 GLShader::GLShader()
-        : m_shader_ref(Constant::kGlInvalidRef)
-
-{
+        : m_shader_ref(Constant::kGlInvalidRef) {
 }
 
-GLShader::~GLShader()
-{
+GLShader::~GLShader() {
     clean();
 }
 
-int GLShader::load(GLenum type, const char *shader_glsl)
-{
+void GLShader::load(GLenum type, const char *shader_glsl) {
     clean();
 
-    m_shader_ref= glCreateShader(type);
+    m_shader_ref = glCreateShader(type);
     if (m_shader_ref == Constant::kGlInvalidRef) {
-        return Error::ERR_GL_CREATE_SHADER_REF;
+        throw PageFlipException(Error::ERR_GL_CREATE_SHADER_REF);
     }
 
     glShaderSource(m_shader_ref, 1, &shader_glsl, NULL);
@@ -50,20 +49,19 @@ int GLShader::load(GLenum type, const char *shader_glsl)
         if (info_len) {
             info_len = check_err_desc_len(info_len);
             glGetShaderInfoLog(m_shader_ref, info_len, NULL, err_desc);
-            glDeleteShader(m_shader_ref);
-            m_shader_ref = Constant::kGlInvalidRef;
         }
 
-        return Error::ERR_GL_COMPILE_SHADER;
+        glDeleteShader(m_shader_ref);
+        m_shader_ref = Constant::kGlInvalidRef;
+        throw PageFlipException(Error::ERR_GL_COMPILE_SHADER);
     }
-
-    return Error::OK;
 }
 
-void GLShader::clean()
-{
+void GLShader::clean() {
     if (m_shader_ref != Constant::kGlInvalidRef) {
         glDeleteShader(m_shader_ref);
         m_shader_ref = Constant::kGlInvalidRef;
     }
+}
+
 }

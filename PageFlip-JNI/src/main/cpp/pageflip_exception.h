@@ -14,24 +14,42 @@
  * limitations under the License.
  */
 
-#ifndef ANDROID_PAGEFLIP_POINTF_H
-#define ANDROID_PAGEFLIP_POINTF_H
+#ifndef ANDROID_PAGEFLIP_PAGEFLIP_EXCEPTION_H
+#define ANDROID_PAGEFLIP_PAGEFLIP_EXCEPTION_H
+
+#include <exception>
+#include <string>
+#include "error.h"
+
+using namespace std;
 
 namespace eschao {
 
-struct PointF {
-    float x;
-    float y;
+class PageFlipException : public exception {
 
-    PointF() : x(0), y(0) { }
-
-    PointF(float x, float y) : x(x), y(y) { }
-
-    inline void set(float x, float y) {
-        this->x = x;
-        this->y = y;
+public:
+    PageFlipException() : m_code(Error::ERROR) {
+        m_message = "";
     }
+
+    PageFlipException(int code, const char *msg = "") {
+        m_code = code;
+        m_message = msg;
+    }
+
+    const char *what() const {
+        return m_message.c_str();
+    }
+
+    inline int code() const {
+        return m_code;
+    }
+
+private:
+    int m_code;
+    string m_message;
 };
 
 }
-#endif //ANDROID_PAGEFLIP_POINTF_H
+
+#endif //ANDROID_PAGEFLIP_PAGEFLIP_EXCEPTION_H

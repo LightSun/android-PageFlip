@@ -4,10 +4,11 @@
 
 #include "error.h"
 
+namespace eschao {
+
 char err_desc[MAX_DESC_LENGTH + 1];
 
-int check_err_desc_len(int len)
-{
+int check_err_desc_len(int len) {
     if (len > MAX_DESC_LENGTH) {
         len = MAX_DESC_LENGTH;
     }
@@ -16,3 +17,4 @@ int check_err_desc_len(int len)
     return len;
 }
 
+}

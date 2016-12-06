@@ -17,34 +17,30 @@
 #include "vertexes.h"
 #include "error.h"
 
+namespace eschao {
+
 Vertexes::Vertexes()
         : m_next(0),
           m_capacity(0),
           m_size_of_per_vex(0),
           m_vertexes(NULL),
-          m_tex_coords(NULL)
-{
+          m_tex_coords(NULL) {
 }
 
-Vertexes::Vertexes(int capacity, int size_per_vex, bool has_texture)
-{
+Vertexes::Vertexes(int capacity, int size_per_vex, bool has_texture) {
     set(capacity, size_per_vex, has_texture);
 }
 
-Vertexes::~Vertexes()
-{
+Vertexes::~Vertexes() {
     release();
 }
 
-void Vertexes::release()
-{
-    if (m_vertexes)
-    {
+void Vertexes::release() {
+    if (m_vertexes) {
         delete m_vertexes[m_capacity * m_size_of_per_vex];
     }
 
-    if (m_tex_coords)
-    {
+    if (m_tex_coords) {
         delete m_tex_coords[m_capacity << 1];
     }
 
@@ -53,11 +49,9 @@ void Vertexes::release()
     m_size_of_per_vex = 0;
 }
 
-int Vertexes::set(int capacity, int size_of_per_vex, bool has_texture)
-{
-    if (size_of_per_vex < 2)
-    {
-        return Error::ERR_INVALID_PARAMETER;
+void Vertexes::set(int capacity, int size_of_per_vex, bool has_texture) {
+    if (size_of_per_vex < 2) {
+        throw PageFlipException(Error::ERR_INVALID_PARAMETER);
     }
 
     release();
@@ -68,20 +62,17 @@ int Vertexes::set(int capacity, int size_of_per_vex, bool has_texture)
     if (has_texture) {
         m_tex_coords = new float[capacity << 1];
     }
-    return Error::OK;
 }
 
-Vertexes& Vertexes::add_vertex(float x, float y, float z)
-{
+Vertexes &Vertexes::add_vertex(float x, float y, float z) {
     m_vertexes[m_next++] = x;
     m_vertexes[m_next++] = y;
     m_vertexes[m_next++] = z;
     return *this;
 }
 
-Vertexes& Vertexes::add_vertex(float x, float y, float z,
-                               float tx, float ty)
-{
+Vertexes &Vertexes::add_vertex(float x, float y, float z,
+                               float tx, float ty) {
     int j = m_next / m_size_of_per_vex * 2;
     m_vertexes[m_next++] = x;
     m_vertexes[m_next++] = y;
@@ -92,8 +83,7 @@ Vertexes& Vertexes::add_vertex(float x, float y, float z,
     return *this;
 }
 
-Vertexes& Vertexes::add_vertex(float x, float y, float z, float w)
-{
+Vertexes &Vertexes::add_vertex(float x, float y, float z, float w) {
     m_vertexes[m_next++] = x;
     m_vertexes[m_next++] = y;
     m_vertexes[m_next++] = z;
@@ -101,9 +91,8 @@ Vertexes& Vertexes::add_vertex(float x, float y, float z, float w)
     return *this;
 }
 
-Vertexes& Vertexes::add_vertex(float x, float y, float z, float w,
-                               float tx, float ty)
-{
+Vertexes &Vertexes::add_vertex(float x, float y, float z, float w,
+                               float tx, float ty) {
     int j = m_next / m_size_of_per_vex * 2;
     m_vertexes[m_next++] = x;
     m_vertexes[m_next++] = y;
@@ -115,8 +104,7 @@ Vertexes& Vertexes::add_vertex(float x, float y, float z, float w,
     return *this;
 }
 
-Vertexes& Vertexes::add_vertex(GLPoint &p)
-{
+Vertexes &Vertexes::add_vertex(GLPoint &p) {
     int j = m_next / m_size_of_per_vex * 2;
     m_vertexes[m_next++] = p.x;
     m_vertexes[m_next++] = p.y;
@@ -127,8 +115,8 @@ Vertexes& Vertexes::add_vertex(GLPoint &p)
     return *this;
 }
 
-void Vertexes::draw_with(GLenum type, GLint vertex_pos_loc, GLint tex_coord_loc)
-{
+void Vertexes::draw_with(GLenum type, GLint vertex_pos_loc,
+                         GLint tex_coord_loc) {
     glVertexAttribPointer(vertex_pos_loc, m_size_of_per_vex, GL_FLOAT,
                           GL_FALSE, 0, m_vertexes);
     glEnableVertexAttribArray(vertex_pos_loc);
@@ -141,8 +129,7 @@ void Vertexes::draw_with(GLenum type, GLint vertex_pos_loc, GLint tex_coord_loc)
 }
 
 void Vertexes::draw_with(GLenum type, GLint vertex_pos_loc, GLint tex_coord_loc,
-                         int offset, int length)
-{
+                         int offset, int length) {
     glVertexAttribPointer(vertex_pos_loc, m_size_of_per_vex, GL_FLOAT,
                           GL_FALSE, 0, m_vertexes);
     glEnableVertexAttribArray(vertex_pos_loc);
@@ -152,4 +139,6 @@ void Vertexes::draw_with(GLenum type, GLint vertex_pos_loc, GLint tex_coord_loc,
     glEnableVertexAttribArray(tex_coord_loc);
 
     glDrawArrays(type, offset, length);
+}
+
 }

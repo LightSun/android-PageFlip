@@ -16,6 +16,8 @@
 
 #include "gl_view_rect.h"
 
+namespace eschao {
+
 GLViewRect::GLViewRect()
         : left(0), right(0), top(0), bottom(0), width(0), height(0),
           half_width(0), half_height(0), margin_left(0), margin_right(0),
@@ -44,4 +46,6 @@ void GLViewRect::set(float surface_width, float surface_height,
     right = half_width - margin_right;
     top = half_height;
     bottom = -half_height;
+}
+
 }

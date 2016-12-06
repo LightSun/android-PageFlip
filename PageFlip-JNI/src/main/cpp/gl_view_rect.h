@@ -17,38 +17,36 @@
 #ifndef ANDROID_PAGEFLIP_GLVIEWRECT_H
 #define ANDROID_PAGEFLIP_GLVIEWRECT_H
 
+namespace eschao {
+
 class GLViewRect {
 
 public:
     GLViewRect();
+
     GLViewRect(float surface_width, float surface_height,
                float margin_left, float margin_right);
 
     void set(float surface_width, float surface_height,
              float margin_left, float margin_right);
 
-    inline void set(float surfaceWidth, float surfaceHeight)
-    {
+    inline void set(float surfaceWidth, float surfaceHeight) {
         set(surfaceWidth, surfaceHeight, margin_left, margin_right);
     }
 
-    inline void set_margin(float margin_left, float margin_right)
-    {
+    inline void set_margin(float margin_left, float margin_right) {
         set(surface_width, surface_height, margin_left, margin_right);
     }
 
-    inline float min_of_width_height()
-    {
+    inline float min_of_width_height() {
         return width > height ? width : height;
     }
 
-    inline float to_opengl_x(float x)
-    {
+    inline float to_opengl_x(float x) {
         return x - half_width;
     }
 
-    inline float to_opengl_y(float y)
-    {
+    inline float to_opengl_y(float y) {
         return half_height - y;
     }
 
@@ -68,5 +66,5 @@ public:
     float surface_height;
 };
 
-
+}
 #endif //ANDROID_PAGEFLIP_GLVIEWRECT_H

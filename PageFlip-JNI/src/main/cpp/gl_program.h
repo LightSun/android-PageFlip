@@ -20,25 +20,29 @@
 #include <GLES2/gl2.h>
 #include "gl_shader.h"
 
+namespace eschao {
+
 class GLShader;
 
 class GLProgram {
 
 public:
     GLProgram();
+
     virtual ~GLProgram();
 
-    virtual int init(const char* shader_glsl, const char* fragment_glsl);
+    virtual void init(const char *shader_glsl, const char *fragment_glsl);
+
     virtual void clean();
 
     // inline
-    inline int program_ref()
-    {
+    inline int program_ref() {
         return m_program_ref;
     }
 
 protected:
     int check_gl_error(const char *desc);
+
     virtual void get_vars_location() = 0;
 
 protected:
@@ -47,4 +51,5 @@ protected:
     GLShader m_fragment;
 };
 
+}
 #endif //ANDROID_PAGEFLIP_GLPROGRAM_H

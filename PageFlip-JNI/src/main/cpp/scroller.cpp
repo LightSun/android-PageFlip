@@ -16,35 +16,33 @@
 
 #include "scroller.h"
 
+namespace eschao {
+
 Scroller::Scroller()
-        : m_finished(true)
-{
+        : m_finished(true) {
     m_interpolator = new LinearInterpolator();
 }
 
 Scroller::Scroller(Interpolator *interpolator)
-        : m_finished(true), m_interpolator(interpolator)
-{
+        : m_finished(true), m_interpolator(interpolator) {
 }
 
-Scroller::~Scroller()
-{
+Scroller::~Scroller() {
     if (m_interpolator) {
         delete m_interpolator;
     }
 }
 
-bool Scroller::compute_scroll_offset()
-{
+bool Scroller::compute_scroll_offset() {
     if (m_finished) {
         return false;
     }
 
     long time_passed = get_system_clock() - m_start_time;
     if (time_passed < m_duration) {
-        const float x = m_interpolator->interpolate( time_passed * m_duration);
-        m_curr_x = (float)(m_start_x + round(x * m_delta_x));
-        m_curr_y = (float)(m_start_y + round(x * m_delta_y));
+        const float x = m_interpolator->interpolate(time_passed * m_duration);
+        m_curr_x = (float) (m_start_x + round(x * m_delta_x));
+        m_curr_y = (float) (m_start_y + round(x * m_delta_y));
     }
     else {
         m_curr_x = m_final_x;
@@ -56,8 +54,7 @@ bool Scroller::compute_scroll_offset()
 }
 
 void Scroller::start_scroll(float start_x, float start_y, float dx, float dy,
-                            int duration)
-{
+                            int duration) {
     m_finished = false;
     m_duration = duration;
     m_start_time = get_system_clock();
@@ -68,4 +65,6 @@ void Scroller::start_scroll(float start_x, float start_y, float dx, float dy,
     m_final_y = start_y + dy;
     m_delta_x = dx;
     m_delta_y = dy;
+}
+
 }

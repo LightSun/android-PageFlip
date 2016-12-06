@@ -30,7 +30,7 @@ add_library( # Sets the name of the library.
              src/main/cpp/shadow_vertexes.cpp
              src/main/cpp/back_of_fold_vertexes.cpp
              src/main/cpp/page.cpp
-             src/main/cpp/page_flip.cpp
+             src/main/cpp/pageflip.cpp
              src/main/cpp/scroller.cpp
              )
 

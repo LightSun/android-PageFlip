@@ -18,29 +18,30 @@
 #define ANDROID_PAGEFLIP_SHADOWCOLOR_H
 
 #include "error.h"
+#include "pageflip_exception.h"
+
+namespace eschao {
 
 class ShadowColor {
 
 public:
 
-    ShadowColor() : start_color(0), start_alpha(0), end_color(0), end_alpha(0)
-    { }
+    ShadowColor() : start_color(0), start_alpha(0), end_color(0),
+                    end_alpha(0) { }
 
-    inline int set(float start_color, float start_alpha,
-                   float end_color, float end_alpha)
-    {
+    inline void set(float start_color, float start_alpha,
+                    float end_color, float end_alpha) {
         if (start_color < 0 || start_color > 1 ||
             start_alpha < 0 || start_alpha > 1 ||
             end_color < 0 || end_color > 1 ||
             end_alpha < 0 || end_alpha > 1) {
-            return Error::ERR_INVALID_PARAMETER;
+            throw PageFlipException(Error::ERR_INVALID_PARAMETER);
         }
 
         this->start_color = start_color;
         this->start_alpha = start_alpha;
         this->end_color = end_color;
         this->end_alpha = end_alpha;
-        return Error::OK;
     }
 
 public:
@@ -50,4 +51,5 @@ public:
     float end_alpha;
 };
 
+}
 #endif //ANDROID_PAGEFLIP_SHADOWCOLOR_H

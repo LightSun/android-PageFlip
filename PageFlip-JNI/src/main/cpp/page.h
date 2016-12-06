@@ -30,6 +30,8 @@
 #define BACK_TEXTURE_ID     2
 #define TEXTURE_SIZE        3
 
+namespace eschao {
+
 class PageFlip;
 
 /**
@@ -38,52 +40,50 @@ class PageFlip;
 class Textures {
 
 public:
-    Textures::Textures() : unused_ids_size(0)
-    {
-        memset(is_used, false, sizeof(bool)*TEXTURE_SIZE);
+    Textures::Textures() : unused_ids_size(0) {
+        memset(is_used, false, sizeof(bool) * TEXTURE_SIZE);
     }
 
     void set_first_texture_with_second();
+
     void set_second_texture_with_first();
-    void swap_textures_with(Textures& rhs);
+
+    void swap_textures_with(Textures &rhs);
+
     void set_first_texture(jobject bitmap);
+
     void set_second_texture(jobject bitmap);
+
     void set_back_texture(jobject bitmap);
 
-    inline GLuint back_texture_id()
-    {
+    inline GLuint back_texture_id() {
         return is_used[BACK_TEXTURE_ID] ?
                used_ids[BACK_TEXTURE_ID] :
                used_ids[FIRST_TEXTURE_ID];
     }
 
-    inline bool is_first_texture_set()
-    {
+    inline bool is_first_texture_set() {
         return is_used[FIRST_TEXTURE_ID];
     }
 
-    inline bool is_second_texture_set()
-    {
+    inline bool is_second_texture_set() {
         return is_used[SECOND_TEXTURE_ID];
     }
 
-    inline bool is_back_texture_set()
-    {
+    inline bool is_back_texture_set() {
         return is_used[BACK_TEXTURE_ID];
     }
 
-    inline void delete_unused_textures()
-    {
+    inline void delete_unused_textures() {
         if (unused_ids_size > 0) {
             glDeleteTextures(unused_ids_size, unused_ids);
             unused_ids_size = 0;
         }
     }
 
-    inline void delete_all()
-    {
+    inline void delete_all() {
         glDeleteTextures(TEXTURE_SIZE, used_ids);
-        memset(is_used, false, sizeof(bool)*TEXTURE_SIZE);
+        memset(is_used, false, sizeof(bool) * TEXTURE_SIZE);
     }
 
 public:
@@ -105,78 +105,77 @@ class Page {
 
 public:
     Page();
+
     Page(float left, float right, float top, float bottom);
 
     void set_origin_diagonal_points(bool has_second_page, bool is_top_area);
+
     void invert_y_of_origin_p();
-    void draw_front_page(VertexProgram& program, Vertexes& vertexes);
-    void build_vertexes_of_page_when_veritcal(Vertexes& front_vertexes,
-                                              PointF& x_fold_p1);
-    void build_vertexes_of_page_when_slope(Vertexes& front_vertexes,
-                                           PointF& x_fold_p1,
-                                           PointF& y_fold_p1,
+
+    void draw_front_page(VertexProgram &program, Vertexes &vertexes);
+
+    void build_vertexes_of_page_when_veritcal(Vertexes &front_vertexes,
+                                              PointF &x_fold_p1);
+
+    void build_vertexes_of_page_when_slope(Vertexes &front_vertexes,
+                                           PointF &x_fold_p1,
+                                           PointF &y_fold_p1,
                                            float k_value);
+
     void build_vertexes_of_full_page();
 
-    inline float width()
-    {
+    inline float width() {
         return m_width;
     }
 
-    inline float height()
-    {
+    inline float height() {
         return m_height;
     }
 
-    inline bool is_left_page()
-    {
+    inline bool is_left_page() {
         return m_right <= 0;
     }
 
-    inline bool is_right_page()
-    {
+    inline bool is_right_page() {
         return m_left >= 0;
     }
 
-    inline bool contains(float x, float y)
-    {
+    inline bool contains(float x, float y) {
         return m_left < m_right && m_bottom < m_top &&
                m_left <= x && x < m_right &&
                m_bottom <= y && y < m_top;
     }
 
-    inline bool is_x_in_range(float x, float ratio)
-    {
+    inline bool is_x_in_range(float x, float ratio) {
         const float w = m_width * ratio;
-        return (m_origin_p.x < 0) ? x < (m_origin_p.x + w) : x > (m_origin_p.x - w);
+        return (m_origin_p.x < 0) ? x < (m_origin_p.x + w) :
+               x > (m_origin_p.x - w);
     }
 
-    inline bool is_x_outside_page(float x)
-    {
+    inline bool is_x_outside_page(float x) {
         return (m_origin_p.x < 0) ? x > m_diagonal_p.x : x < m_diagonal_p.x;
     }
 
-    inline float texture_x(float x)
-    {
+    inline float texture_x(float x) {
         return (x - m_left) ? m_tex_width;
     }
 
-    inline float texture_y(float y)
-    {
-        return (m_top - y ) / m_tex_height;
+    inline float texture_y(float y) {
+        return (m_top - y) / m_tex_height;
     }
 
-    inline void draw_full_page(VertexProgram& program, bool is_first)
-    {
+    inline void draw_full_page(VertexProgram &program, bool is_first) {
         is_first ?
-            draw_full_page(program, textures.used_ids[FIRST_TEXTURE_ID]) :
-            draw_full_page(program, textures.used_ids[SECOND_TEXTURE_ID]);
+        draw_full_page(program, textures.used_ids[FIRST_TEXTURE_ID]) :
+        draw_full_page(program, textures.used_ids[SECOND_TEXTURE_ID]);
     }
 
 private:
     void init(float left, float right, float top, float bottom);
+
     void compute_index_of_apex_order();
-    void draw_full_page(VertexProgram& program, GLuint texture_id);
+
+    void draw_full_page(VertexProgram &program, GLuint texture_id);
 
 public:
     Textures textures;
@@ -306,4 +305,5 @@ private:
     friend class PageFlip;
 };
 
+}
 #endif //ANDROID_PAGEFLIP_PAGE_H

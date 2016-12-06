@@ -19,28 +19,29 @@
 
 #include "vertex_program.h"
 
+namespace eschao {
+
 class BackOfFoldVertexProgram : public VertexProgram {
 
 public:
     BackOfFoldVertexProgram();
+
     ~BackOfFoldVertexProgram();
 
     void clean();
-    int init();
+
+    void init();
 
     // inline
-    inline GLint get_shadow_loc()
-    {
+    inline GLint get_shadow_loc() {
         return m_shadow_loc;
     }
 
-    inline GLint get_mask_color_loc()
-    {
+    inline GLint get_mask_color_loc() {
         return m_mask_color_loc;
     }
 
-    inline GLint get_tex_x_offset_loc()
-    {
+    inline GLint get_tex_x_offset_loc() {
         return m_tex_x_offset_loc;
     }
 
@@ -48,13 +49,14 @@ protected:
     void get_vars_location();
 
 protected:
-    static const char *VAR_TEXTURE_OFFSET   = "u_texXOffset";
-    static const char *VAR_MASK_COLOR       = "u_maskColor";
-    static const char *VAR_SHADOW_TEXTURE   = "u_shadow";
+    static const char *VAR_TEXTURE_OFFSET = "u_texXOffset";
+    static const char *VAR_MASK_COLOR = "u_maskColor";
+    static const char *VAR_SHADOW_TEXTURE = "u_shadow";
 
     GLint m_shadow_loc;
     GLint m_mask_color_loc;
     GLint m_tex_x_offset_loc;
 };
 
+}
 #endif //ANDROID_PAGEFLIP_BACKOFFOLDVERTEXPROGRAM_H

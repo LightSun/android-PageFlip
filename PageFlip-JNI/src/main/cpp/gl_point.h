@@ -17,6 +17,8 @@
 #ifndef ANDROID_PAGEFLIP_GLPOINT_H
 #define ANDROID_PAGEFLIP_GLPOINT_H
 
+namespace eschao {
+
 /**
  * OpenGL point includes (x, y, z) coordinate in 3D system and corresponding texture coordinate
  * (x, y)
@@ -24,15 +26,12 @@
 struct GLPoint {
 
 public:
-    GLPoint() : x(0), y(0), z(0), tex_x(0), tex_y(0)
-    { }
+    GLPoint() : x(0), y(0), z(0), tex_x(0), tex_y(0) { }
 
     GLPoint(float x, float y, float z, float tex_x, float tex_y)
-            : x(x), y(y), z(z), tex_x(tex_x), tex_y(tex_y)
-    { }
+            : x(x), y(y), z(z), tex_x(tex_x), tex_y(tex_y) { }
 
-    inline void set(float x, float y, float z, float tex_x, float tex_y)
-    {
+    inline void set(float x, float y, float z, float tex_x, float tex_y) {
         this->x = x;
         this->y = y;
         this->z = z;
@@ -48,4 +47,6 @@ public:
     float tex_x;
     float tex_y;
 };
+
+}
 #endif //ANDROID_PAGEFLIP_GLPOINT_H

@@ -18,7 +18,9 @@
 #include <GLES2/gl2.h>
 #include <algorithm>
 #include "page.h"
-#include "page_flip.h"
+#include "pageflip.h"
+
+namespace eschao {
 
 PageFlip::PageFlip()
         : m_flip_state(END_FLIP),
@@ -27,6 +29,7 @@ PageFlip::PageFlip()
           m_semi_perimeter_ratio(0.8f),
           m_is_click_to_flip(true),
           m_width_ratio_of_click_to_flip(kWidthRatioOfClickToFlip),
+          m_scroller(new AccelerateInterpolator()),
           m_page_mode(SINGLE_PAGE_MODE),
           m_first_page(NULL),
           m_second_page(NULL),
@@ -80,9 +83,17 @@ void PageFlip::on_surface_created()
     glClearDepthf(1.0f);
     glEnable(GL_DEPTH_TEST);
 
-    m_vertex_prog.init();
-    m_shadow_vertex_prog.init();
-    m_back_of_fold_vertex_prog.init();
+    try {
+        m_vertex_prog.init();
+        m_shadow_vertex_prog.init();
+        m_back_of_fold_vertex_prog.init();
+    }
+    catch (PageFlipException& e) {
+        m_vertex_prog.clean();
+        m_shadow_vertex_prog.clean();
+        m_back_of_fold_vertex_prog.clean();
+        throw e;
+    }
 }
 
 void PageFlip::on_surface_changed(int width, int height)
@@ -177,8 +188,7 @@ bool PageFlip::on_finger_move(float x, float y)
         }
 
         // determine if it is moving m_backward or m_forward
-        if (m_second_page == NULL &&
-            dx > 0)
+        if (m_second_page == NULL && dx > 0)
             //mListener != null &&
             //mListener.canFlipBackward())
             {
@@ -265,7 +275,6 @@ bool PageFlip::on_finger_move(float x, float y)
     }
 
     return false;
-    }
 }
 
 bool PageFlip::on_finger_up(float x, float y, int duration) {
@@ -322,9 +331,9 @@ bool PageFlip::on_finger_up(float x, float y, int duration) {
     if (m_flip_state == FORWARD_FLIP ||
         m_flip_state == BACKWARD_FLIP ||
         m_flip_state == RESTORE_FLIP) {
-        //mScroller.startScroll(start.x, start.y,
-        //                      end.x - start.x, end.y - start.y,
-        //                      duration);
+        m_scroller.start_scroll(start.x, start.y,
+                                end.x - start.x, end.y - start.y,
+                                duration);
         return true;
     }
 
@@ -409,11 +418,11 @@ bool PageFlip::animating()
     const GLPoint& diagonal_p = page.m_diagonal_p;
 
     // is to end animating?
-    bool is_animating = true;//!mScroller.isFinished();
+    bool is_animating = m_scroller.is_finished();
     if (is_animating) {
         // get new (x, y)
-        //mScroller.computeScrollOffset();
-        //m_touch_p.set(mScroller.getCurrX(), mScroller.getCurrY());
+        m_scroller.compute_scroll_offset();
+        m_touch_p.set(m_scroller.curr_x(), m_scroller.curr_y());
 
         // for m_backward and restore flip, compute x to check if it can
         // continue to flip
@@ -429,7 +438,7 @@ bool PageFlip::animating()
 
         // compute middle point
         m_middle_p.set((m_touch_p.x + origin_p.x) * 0.5f,
-                      (m_touch_p.y + origin_p.y) * 0.5f);
+                       (m_touch_p.y + origin_p.y) * 0.5f);
 
         // compute key points
         if (m_is_vertical) {
@@ -646,7 +655,7 @@ void PageFlip::compute_key_vertexes_when_vertical()
     m_radius = (float)(m_len_of_t2o * m_semi_perimeter_ratio / M_PI);
 
     // compute mesh count
-    compute_max_mesh_count();
+    compute_mesh_count();
 }
 
 /**
@@ -741,7 +750,7 @@ void PageFlip::compute_key_vertexes_when_slope()
     m_k_value = (m_touch_p.y - o_y) / (m_touch_p.x - o_x);
 
     // compute mesh count
-    compute_max_mesh_count();
+    compute_mesh_count();
 }
 
 /**
@@ -751,7 +760,7 @@ void PageFlip::compute_key_vertexes_when_slope()
  * the below steps to compute its 3D point (x,y,z) on curled page(cylinder):
  * </p>
  * <ul>
- *     <li>deem originP as (0, 0) to simplify the m_next computing steps</li>
+ *     <li>deem originP as (0, 0) to simplify the next computing steps</li>
  *     <li>translate point(x, y) to new coordinate system
  *     (originP is (0, 0))</li>
  *     <li>rotate point(x, y) with curling angle A in clockwise</li>
@@ -874,7 +883,7 @@ void PageFlip::compute_front_vertex(bool is_x, float x0, float y0, float xfx,
                                     float sin_a, float cos_a,
                                     float base_w_cos_a, float base_w_sin_a,
                                     float tex_x, float tex_y,
-                                    float o_x, float o_y, float d_y)
+                                    float o_x, float o_y)
 {
     // rotate degree A
     float x = x0 * cos_a - y0 * sin_a;
@@ -1175,10 +1184,10 @@ void PageFlip::compute_vertexes_when_slope()
            ++j, x -= step_x, y -= step_y) {
         compute_front_vertex(true, x, 0, x_fp1, sin_a, cos_a,
                              base_w_cos_a, base_w_sin_a,
-                             page.texture_x(x + o_x), t_oy, o_x, o_y, d_y);
+                             page.texture_x(x + o_x), t_oy, o_x, o_y);
         compute_front_vertex(false, 0, y, x_fp1, sin_a, cos_a,
                              base_w_cos_a, base_w_sin_a,
-                             t_ox, page.texture_y(y + o_y), o_x, o_y, d_y);
+                             t_ox, page.texture_y(y + o_y), o_x, o_y);
     }
 
     // compute points outside the page
@@ -1189,7 +1198,7 @@ void PageFlip::compute_vertexes_when_slope()
             float x1 = m_k_value * y1;
             compute_front_vertex(true, x1, 0, x_fp1, sin_a, cos_a,
                                  base_w_cos_a, base_w_sin_a,
-                                 page.texture_x(x1 + o_x), t_oy, o_x, o_y, d_y);
+                                 page.texture_x(x1 + o_x), t_oy, o_x, o_y);
 
             compute_front_vertex(0, y1, x_fp1, sin_a, cos_a, t_ox,
                                  page.texture_y(y1+o_y), o_x, o_y) ;
@@ -1204,7 +1213,7 @@ void PageFlip::compute_vertexes_when_slope()
         for (; j < m_mesh_count; ++j, x -= step_x, y -= step_y) {
             compute_front_vertex(true, x, 0, x_fp1, sin_a, cos_a,
                                  base_w_cos_a, base_w_sin_a,
-                                 page.texture_x(x + o_x), t_oy, o_x, o_y, d_y);
+                                 page.texture_x(x + o_x), t_oy, o_x, o_y);
 
             float x1 = m_k_value * (y + o_y - d_y);
             compute_front_vertex(x1, d2o_y, x_fp1, sin_a, cos_a,
@@ -1323,7 +1332,6 @@ float PageFlip::compute_tan_of_curl_angle(float dy)
     }
 }
 
-
 /**
  * Debug information
  */
@@ -1350,3 +1358,6 @@ private void debugInfo() {
     Log.d(TAG, " LengthT->O:    " + mLenOfTouchOrigin);
 }
 */
+
+}
+

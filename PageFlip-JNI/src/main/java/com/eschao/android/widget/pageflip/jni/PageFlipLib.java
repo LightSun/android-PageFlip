@@ -1,6 +1,6 @@
 package com.eschao.android.widget.pageflip.jni;
 
-public class PageFlipJNI {
+public class PageFlipLib {
 
     public static native boolean onSurfaceCreated();
     public static native boolean onSurfaceChanged(int width, int height);

@@ -19,6 +19,8 @@
 
 #include <math.h>
 
+namespace eschao {
+
 #define normalize(x, y, z) \
 { \
     float norm = 1.0f / sqrt(x*x+y*y+z*z);\
@@ -34,14 +36,18 @@ public:
     static void ortho(float *m,
                       float left, float right, float bottom, float top,
                       float near, float far);
+
     static void set_identity(float *m);
+
     static void set_look_at(float *m,
                             float eye_x, float eye_y, float eye_z,
                             float center_x, float center_y, float center_z,
                             float up_x, float up_y, float up_z);
+
     static void multiply_mm(float *m, float *lhs, float *rhs);
+
     static void translate(float *m, float x, float y, float z);
 };
 
-
+}
 #endif //ANDROID_PAGEFLIP_MATRIX_H

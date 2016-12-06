@@ -20,10 +20,11 @@
 
 using namespace std;
 
+namespace eschao {
+
 static const size_t kSizeOf3Float = sizeof(float) * 3;
 
-void Textures::set_first_texture_with_second()
-{
+void Textures::set_first_texture_with_second() {
     if (is_used[FIRST_TEXTURE_ID]) {
         unused_ids[unused_ids_size++] = used_ids[FIRST_TEXTURE_ID];
     }
@@ -34,8 +35,7 @@ void Textures::set_first_texture_with_second()
     is_used[SECOND_TEXTURE_ID] = false;
 }
 
-void Textures::set_second_texture_with_first()
-{
+void Textures::set_second_texture_with_first() {
     if (is_used[SECOND_TEXTURE_ID]) {
         unused_ids[unused_ids_size++] = used_ids[SECOND_TEXTURE_ID];
     }
@@ -46,8 +46,7 @@ void Textures::set_second_texture_with_first()
     is_used[FIRST_TEXTURE_ID] = false;
 }
 
-void Textures::swap_textures_with(Textures &rhs)
-{
+void Textures::swap_textures_with(Textures &rhs) {
     unused_ids[unused_ids_size++] = used_ids[SECOND_TEXTURE_ID];
     used_ids[SECOND_TEXTURE_ID] = used_ids[FIRST_TEXTURE_ID];
 
@@ -61,8 +60,7 @@ void Textures::swap_textures_with(Textures &rhs)
     rhs.is_used[SECOND_TEXTURE_ID] = false;
 }
 
-void Textures::set_first_texture(jobject bitmap)
-{
+void Textures::set_first_texture(jobject bitmap) {
     /*
     int color = PageFlipUtils.computeAverageColor(b, 30);
     maskColor[FIRST_TEXTURE_ID][0] = Color.red(color) / 255.0f;
@@ -78,8 +76,7 @@ void Textures::set_first_texture(jobject bitmap)
     */
 }
 
-void Textures::set_second_texture(jobject bitmap)
-{
+void Textures::set_second_texture(jobject bitmap) {
     /*
     int color = PageFlipUtils.computeAverageColor(b, 30);
     maskColor[SECOND_TEXTURE_ID][0] = Color.red(color) / 255.0f;
@@ -95,8 +92,7 @@ void Textures::set_second_texture(jobject bitmap)
     */
 }
 
-void Textures::set_back_texture(jobject bitmap)
-{
+void Textures::set_back_texture(jobject bitmap) {
     /*
     if (b == null) {
         // back texture is same with the first texture
@@ -121,18 +117,15 @@ void Textures::set_back_texture(jobject bitmap)
     */
 }
 
-Page::Page()
-{
+Page::Page() {
     init(0, 0, 0, 0);
 }
 
-Page::Page(float left, float right, float top, float bottom)
-{
+Page::Page(float left, float right, float top, float bottom) {
     init(left, right, top, bottom);
 }
 
-void Page::init(float left, float right, float top, float bottom)
-{
+void Page::init(float left, float right, float top, float bottom) {
     m_top = top;
     m_left = left;
     m_right = right;
@@ -148,8 +141,7 @@ void Page::init(float left, float right, float top, float bottom)
     m_apex_order_index = 0;
 }
 
-void Page::compute_index_of_apex_order()
-{
+void Page::compute_index_of_apex_order() {
     m_apex_order_index = 0;
     if (m_origin_p.x < m_right && m_origin_p.y < 0) {
         m_apex_order_index = 3;
@@ -164,8 +156,7 @@ void Page::compute_index_of_apex_order()
     }
 }
 
-void Page::set_origin_diagonal_points(bool has_second_page, bool is_top_area)
-{
+void Page::set_origin_diagonal_points(bool has_second_page, bool is_top_area) {
     if (has_second_page && m_left < 0) {
         m_origin_p.x = m_left;
         m_diagonal_p.x = m_right;
@@ -192,15 +183,13 @@ void Page::set_origin_diagonal_points(bool has_second_page, bool is_top_area)
     m_diagonal_p.tex_y = (m_top - m_diagonal_p.y) / m_tex_height;
 }
 
-void Page::invert_y_of_origin_p()
-{
+void Page::invert_y_of_origin_p() {
     swap(m_origin_p.y, m_diagonal_p.y);
     swap(m_origin_p.tex_y, m_diagonal_p.tex_y);
     compute_index_of_apex_order();
 }
 
-void Page::draw_front_page(VertexProgram &program, Vertexes &vertexes)
-{
+void Page::draw_front_page(VertexProgram &program, Vertexes &vertexes) {
     // 1. draw unfold part and curled part with the first texture
     glUniformMatrix4fv(program.mvp_matrix_loc(), 1, GL_FALSE,
                        VertexProgram::mvp_matrix);
@@ -217,8 +206,7 @@ void Page::draw_front_page(VertexProgram &program, Vertexes &vertexes)
                  vertexes.count() - m_front_vertex_count);
 }
 
-void Page::draw_full_page(VertexProgram &program, GLuint texture_id)
-{
+void Page::draw_full_page(VertexProgram &program, GLuint texture_id) {
     glBindTexture(GL_TEXTURE_2D, texture_id);
     glUniform1i(program.texture_loc(), 0);
 
@@ -234,8 +222,7 @@ void Page::draw_full_page(VertexProgram &program, GLuint texture_id)
 }
 
 void Page::build_vertexes_of_page_when_veritcal(Vertexes &front_vertexes,
-                                                PointF &x_fold_p1)
-{
+                                                PointF &x_fold_p1) {
     // if xFoldX and yFoldY are both outside the page, use the last vertex
     // order to draw page
     int index = 4;
@@ -294,13 +281,12 @@ void Page::build_vertexes_of_page_when_veritcal(Vertexes &front_vertexes,
 void Page::build_vertexes_of_page_when_slope(Vertexes &front_vertexes,
                                              PointF &x_fold_p1,
                                              PointF &y_fold_p1,
-                                             float k_value)
-{
+                                             float k_value) {
     // compute xFoldX point
     float half_h = m_height * 0.5f;
     int index = 0;
     m_x_fold_p.set(x_fold_p1.x, m_origin_p.y, 0,
-                  texture_x(x_fold_p1.x), m_origin_p.tex_y);
+                   texture_x(x_fold_p1.x), m_origin_p.tex_y);
     if (is_x_outside_page(x_fold_p1.x)) {
         index = 2;
         m_x_fold_p.x = m_diagonal_p.x;
@@ -311,8 +297,8 @@ void Page::build_vertexes_of_page_when_slope(Vertexes &front_vertexes,
 
     // compute yFoldY point
     m_y_fold_p.set(m_origin_p.x, y_fold_p1.y, 0, m_origin_p.tex_x,
-                  texture_y(y_fold_p1.y));
-    if (fabs(y_fold_p1.y) > half_h)  {
+                   texture_y(y_fold_p1.y));
+    if (fabs(y_fold_p1.y) > half_h) {
         index++;
         m_y_fold_p.x = m_origin_p.x + k_value * (y_fold_p1.y - m_diagonal_p.y);
         if (is_x_outside_page(m_y_fold_p.x)) {
@@ -367,8 +353,7 @@ void Page::build_vertexes_of_page_when_slope(Vertexes &front_vertexes,
     }
 }
 
-void Page::build_vertexes_of_full_page()
-{
+void Page::build_vertexes_of_full_page() {
     int i = 0;
     int j = 0;
 
@@ -395,4 +380,6 @@ void Page::build_vertexes_of_full_page()
     m_apexes[i] = 0;
     m_apex_tex_coords[j++] = texture_x(m_left);
     m_apex_tex_coords[j] = texture_y(m_bottom);
+}
+
 }

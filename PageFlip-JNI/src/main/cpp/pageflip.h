@@ -22,6 +22,7 @@
 #include "pointf.h"
 #include "gl_point.h"
 #include "gl_view_rect.h"
+#include "scroller.h"
 #include "shadow_width.h"
 #include "vertexes.h"
 #include "shadow_vertexes.h"
@@ -29,6 +30,8 @@
 #include "vertex_program.h"
 #include "shadow_vertex_program.h"
 #include "back_of_fold_vertex_program.h"
+
+namespace eschao {
 
 // default pixels of mesh vertex
 static const int kMeshVertexPixels = 10;
@@ -39,13 +42,15 @@ static const int kMinPageCurlAngle = 5;
 // The max page curl angle (5 degree)
 static const int kMaxPageCurlAngle = 65;
 static const int kPageCurlAngleDiff = (kMaxPageCurlAngle - kMinPageCurlAngle);
-static const float kMinPageCurlRadian = (float)(M_PI * kMinPageCurlAngle / 180);
-static const float kMaxPageCurlRadian = (float)(M_PI * kMaxPageCurlAngle / 180);
-static const float kMinPageCurlTanOfAngle = (float)tan(kMinPageCurlRadian);
-static const float kMaxPageCurlTanOfAngle = (float)tan(kMaxPageCurlRadian);
+static const float kMinPageCurlRadian = (float) (M_PI * kMinPageCurlAngle /
+                                                 180);
+static const float kMaxPageCurlRadian = (float) (M_PI * kMaxPageCurlAngle /
+                                                 180);
+static const float kMinPageCurlTanOfAngle = (float) tan(kMinPageCurlRadian);
+static const float kMaxPageCurlTanOfAngle = (float) tan(kMaxPageCurlRadian);
 static const float kMaxPageCurlAngleRatio = kMaxPageCurlAngle / 90f;
-static const float kMaxTanOfForwardFlip = (float)tan(M_PI / 6);
-static const float kMaxTanOfBackwardFlip = (float)tan(M_PI / 20);
+static const float kMaxTanOfForwardFlip = (float) tan(M_PI / 6);
+static const float kMaxTanOfBackwardFlip = (float) tan(M_PI / 20);
 
 // width m_ratio of clicking to flip
 static const float kWidthRatioOfClickToFlip = 0.5f;
@@ -94,32 +99,40 @@ class PageFlip {
 
 public:
     PageFlip();
+
     ~PageFlip();
 
     bool enable_auto_page(bool is_auto);
+
     void on_surface_created();
+
     void on_surface_changed(int width, int height);
+
     void on_finger_down(float x, float y);
+
     bool on_finger_move(float x, float y);
+
     bool on_finger_up(float x, float y, int duration);
+
     bool can_animate(float x, float y);
+
     bool animating();
+
     void abort_animating();
+
     void draw_flip_frame();
+
     void draw_page_frame();
 
-    inline bool is_auto_page_enabled()
-    {
+    inline bool is_auto_page_enabled() {
         return m_page_mode == AUTO_PAGE_MODE;
     }
 
-    inline void enable_click_to_flip(bool is_enable)
-    {
+    inline void enable_click_to_flip(bool is_enable) {
         m_is_click_to_flip = is_enable;
     }
 
-    inline bool set_width_ratio_of_click_to_flip(float ratio)
-    {
+    inline bool set_width_ratio_of_click_to_flip(float ratio) {
         if (ratio <= 0 || ratio > 0.5f) {
             return false;
         }
@@ -128,13 +141,11 @@ public:
         return true;
     }
 
-    inline void set_pixels_of_mesh(int pixels)
-    {
+    inline void set_pixels_of_mesh(int pixels) {
         m_pixels_of_mesh = pixels > 0 ? m_pixels_of_mesh : kMeshVertexPixels;
     }
 
-    inline bool set_semi_perimeter_ratio(float ratio)
-    {
+    inline bool set_semi_perimeter_ratio(float ratio) {
         if (ratio <= 0 || ratio > 1) {
             return false;
         }
@@ -143,120 +154,125 @@ public:
         return true;
     }
 
-    inline void set_mask_alpha_of_fold(int alpha)
-    {
+    inline void set_mask_alpha_of_fold(int alpha) {
         m_back_of_fold_vertexes.set_mask_alpha(alpha);
     }
 
     inline void set_shadow_color_of_fold_edges(float start_color,
                                                float start_alpha,
                                                float end_color,
-                                               float end_alpha)
-    {
+                                               float end_alpha) {
         m_fold_edge_shadow_vertexes.color.set(start_color, start_alpha,
-                                             end_color, end_alpha);
+                                              end_color, end_alpha);
     }
 
     inline void set_shadow_color_of_fold_base(float start_color,
                                               float start_alpha,
                                               float end_color,
-                                              float end_alpha)
-    {
+                                              float end_alpha) {
         m_fold_base_shadow_vertexes.color.set(start_color, start_alpha,
-                                             end_color, end_alpha);
+                                              end_color, end_alpha);
     }
 
     inline void set_shadow_width_of_fold_edges(float min,
                                                float max,
-                                               float ratio)
-    {
+                                               float ratio) {
         m_fold_edge_shadow_width.set(min, max, ratio);
     }
 
     inline void set_shadow_width_of_fold_base(float min,
                                               float max,
-                                              float ratio)
-    {
+                                              float ratio) {
         m_fold_base_shadow_width.set(min, max, ratio);
     }
 
-    inline int surface_width()
-    {
-        return (int)m_view_rect.surface_width;
+    inline int surface_width() {
+        return (int) m_view_rect.surface_width;
     }
 
-    inline int surface_height()
-    {
-        return (int)m_view_rect.surface_height;
+    inline int surface_height() {
+        return (int) m_view_rect.surface_height;
     }
 
-    inline PageFlipState flip_state()
-    {
+    inline PageFlipState flip_state() {
         return m_flip_state;
     }
 
-    inline bool isAnimating()
-    {
+    inline bool isAnimating() {
         return true;//!mScroller.isFinished();
     }
 
-    inline bool is_started_flip()
-    {
+    inline bool is_started_flip() {
         return m_flip_state == BACKWARD_FLIP ||
                m_flip_state == FORWARD_FLIP ||
                m_flip_state == RESTORE_FLIP;
     }
 
-    inline bool is_ended_flip()
-    {
+    inline bool is_ended_flip() {
         return m_flip_state == END_FLIP ||
                m_flip_state == END_WITH_RESTORE ||
                m_flip_state == END_WITH_BACKWARD ||
                m_flip_state == END_WITH_FORWARD;
     }
 
-    inline void delete_unused_textures()
-    {
+    inline void delete_unused_textures() {
         m_first_page->textures.delete_unused_textures();
         if (m_second_page) {
             m_second_page->textures.delete_unused_textures();
         }
     }
+
 private:
     void create_pages();
+
     void compute_scroll_points_for_clicking_flip(float x,
-                                                 PointF& start,
-                                                 PointF& end);
+                                                 PointF &start,
+                                                 PointF &end);
+
     void compute_max_mesh_count();
+
     void create_gradient_light_texture();
+
     void compute_vertexes_build_page();
+
     void compute_key_vertexes_when_vertical();
+
     void compute_vertexes_when_vertical();
+
     void compute_key_vertexes_when_slope();
+
     void compute_vertexes_when_slope();
+
     void compute_back_vertex(bool is_x, float x0, float y0, float sx0,
                              float sy0, float xfx, float sin_a,
                              float cos_a, float tex_x, float tex_y,
                              float o_x, float o_y);
+
     void compute_back_vertex(float x0, float y0, float xfx,
                              float sin_a, float cos_a, float tex_x,
                              float tex_y, float o_x, float o_y);
+
     void compute_front_vertex(bool is_x, float x0, float y0, float xfx,
                               float sin_a, float cos_a, float base_w_cos_a,
                               float base_w_sin_a, float tex_x, float tex_y,
-                              float o_x, float o_y, float d_y);
+                              float o_x, float o_y);
+
     void compute_front_vertex(float x0, float y0, float xfx,
                               float sin_a, float cos_a,
                               float tex_x, float tex_y,
                               float o_x, float o_y);
+
     void compute_base_shadow_last_vertex(float x0, float y0, float xfs,
                                          float sin_a, float cos_a,
                                          float base_w_cos_a, float base_w_sin_a,
                                          float o_x, float o_y, float d_y);
+
     void compute_vertexes_of_fold_top_edge_shadow(float x0, float y0,
                                                   float sin_a, float cos_a,
                                                   float sx, float sy);
+
     void compute_mesh_count();
+
     float compute_tan_of_curl_angle(float dy);
 
 private:
@@ -361,7 +377,7 @@ private:
     PageFlipState m_flip_state;
 
     // use for flip animation
-    //Scroller scroller_;
+    Scroller m_scroller;
 
     // pages and page mode
     // in single page mode, there is only one page in the index 0
@@ -380,5 +396,5 @@ private:
     //private OnPageFlipListener mListener;
 };
 
-
+}
 #endif //ANDROID_PAGEFLIP_PAGE_FLIP_H
