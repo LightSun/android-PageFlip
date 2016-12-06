@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "Scroller.h"
+#include "scroller.h"
 
 Scroller::Scroller()
         : m_finished(true)

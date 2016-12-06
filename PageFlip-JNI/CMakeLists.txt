@@ -26,11 +26,12 @@ add_library( # Sets the name of the library.
              src/main/cpp/vertex_program.cpp
              src/main/cpp/shadow_vertex_program.cpp
              src/main/cpp/back_of_fold_vertex_program.cpp
-             #src/main/cpp/m_vertexes.cpp
-             #src/main/cpp/shadow_vertexes.cpp
-             #src/main/cpp/back_of_fold_vertexes.cpp
-             #src/main/cpp/page.cpp
-             #src/main/cpp/page_flip.cpp
+             src/main/cpp/vertexes.cpp
+             src/main/cpp/shadow_vertexes.cpp
+             src/main/cpp/back_of_fold_vertexes.cpp
+             src/main/cpp/page.cpp
+             src/main/cpp/page_flip.cpp
+             src/main/cpp/scroller.cpp
              )
 
 # Searches for a specified prebuilt library and stores the path as a
