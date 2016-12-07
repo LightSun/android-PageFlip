@@ -13,11 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.eschao.android.widget.pageflip.jni;
 
-#ifndef ANDROID_PAGEFLIP_PAGEFLIP_JNI_H
-#define ANDROID_PAGEFLIP_PAGEFLIP_JNI_H
+/**
+ * Listener for page flipping
+ *
+ * @author eschao
+ */
 
+public interface OnPageFlipListener {
 
+    /**
+     * Can page flip m_forward?
+     *
+     * @return true if page can flip m_forward
+     */
+    boolean canFlipForward();
 
-
-#endif //ANDROID_PAGEFLIP_PAGEFLIP_JNI_H
+    /**
+     * Can page flip m_backward?
+     *
+     * @return true if page can flip m_backward
+     */
+    boolean canFlipBackward();
+}
