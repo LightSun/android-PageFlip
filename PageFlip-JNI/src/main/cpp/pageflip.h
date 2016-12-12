@@ -48,7 +48,7 @@ static const float kMaxPageCurlRadian = (float) (M_PI * kMaxPageCurlAngle /
                                                  180);
 static const float kMinPageCurlTanOfAngle = (float) tan(kMinPageCurlRadian);
 static const float kMaxPageCurlTanOfAngle = (float) tan(kMaxPageCurlRadian);
-static const float kMaxPageCurlAngleRatio = kMaxPageCurlAngle / 90f;
+static const float kMaxPageCurlAngleRatio = kMaxPageCurlAngle / 90;
 static const float kMaxTanOfForwardFlip = (float) tan(M_PI / 6);
 static const float kMaxTanOfBackwardFlip = (float) tan(M_PI / 20);
 
@@ -65,18 +65,18 @@ static const int kFoldTopEdgeShadowVexCount = 22;
 static const float kFoldEdgeShadowStartColor = 0.1f;
 static const float kFoldEdgeShadowStartAlpha = 0.25f;
 static const float kFoldEdgeShadowEndColor = 0.3f;
-static const float kFoldEdgeShadowEndAlpha = 0f;
+static const float kFoldEdgeShadowEndAlpha = 0;
 
 // fold base shadow color
 static const float kFoldBaseShadowStartColor = 0.05f;
 static const float kFoldBaseShadowStartAlpha = 0.4f;
 static const float kFoldBaseShadowEndColor = 0.3f;
-static const float kFoldBaseShadowEndAlpha = 0f;
+static const float kFoldBaseShadowEndAlpha = 0;
 
 enum PageNo {
     FIRST_PAGE = 0,
     SECOND_PAGE,
-    PAGE_SIZE,
+    PAGES_SIZE
 };
 
 enum PageMode {
@@ -99,180 +99,258 @@ class PageFlip {
 
 public:
     PageFlip();
-
     ~PageFlip();
 
     bool enable_auto_page(bool is_auto);
-
-    void on_surface_created();
-
+    int on_surface_created();
     void on_surface_changed(int width, int height);
-
-    void on_finger_down(float x, float y);
-
-    bool on_finger_move(float x, float y);
-
-    bool on_finger_up(float x, float y, int duration);
-
+    bool on_finger_down(float x, float y);
+    bool on_finger_move(float x, float y, bool can_forward, bool can_backward);
+    bool on_finger_up(float x, float y, int duration,
+                      bool can_forward, bool can_backward);
     bool can_animate(float x, float y);
-
     bool animating();
-
     void abort_animating();
-
     void draw_flip_frame();
-
     void draw_page_frame();
+    int set_gradient_light_texture(AndroidBitmapInfo& info, GLvoid* data);
 
-    inline bool is_auto_page_enabled() {
+    inline bool is_auto_page_enabled()
+    {
         return m_page_mode == AUTO_PAGE_MODE;
     }
 
-    inline void enable_click_to_flip(bool is_enable) {
+    inline void enable_click_to_flip(bool is_enable)
+    {
         m_is_click_to_flip = is_enable;
     }
 
-    inline bool set_width_ratio_of_click_to_flip(float ratio) {
+    inline int set_width_ratio_of_click_to_flip(float ratio)
+    {
         if (ratio <= 0 || ratio > 0.5f) {
-            return false;
+            return g_error.set(Error::ERR_INVALID_PARAMETER);
         }
 
         m_width_ratio_of_click_to_flip = ratio;
-        return true;
+        return Error::OK;
     }
 
-    inline void set_pixels_of_mesh(int pixels) {
+    inline void set_pixels_of_mesh(int pixels)
+    {
         m_pixels_of_mesh = pixels > 0 ? m_pixels_of_mesh : kMeshVertexPixels;
     }
 
-    inline bool set_semi_perimeter_ratio(float ratio) {
+    inline int set_semi_perimeter_ratio(float ratio)
+    {
         if (ratio <= 0 || ratio > 1) {
-            return false;
+            return g_error.set(Error::ERR_INVALID_PARAMETER);
         }
 
         m_semi_perimeter_ratio = ratio;
-        return true;
+        return Error::OK;
     }
 
-    inline void set_mask_alpha_of_fold(int alpha) {
-        m_back_of_fold_vertexes.set_mask_alpha(alpha);
+    inline int set_mask_alpha_of_fold(int alpha)
+    {
+        return m_back_of_fold_vertexes.set_mask_alpha(alpha);
     }
 
-    inline void set_shadow_color_of_fold_edges(float start_color,
-                                               float start_alpha,
-                                               float end_color,
-                                               float end_alpha) {
-        m_fold_edge_shadow_vertexes.color.set(start_color, start_alpha,
-                                              end_color, end_alpha);
-    }
-
-    inline void set_shadow_color_of_fold_base(float start_color,
+    inline int set_shadow_color_of_fold_edges(float start_color,
                                               float start_alpha,
                                               float end_color,
-                                              float end_alpha) {
-        m_fold_base_shadow_vertexes.color.set(start_color, start_alpha,
-                                              end_color, end_alpha);
+                                              float end_alpha)
+    {
+        return m_fold_edge_shadow_vertexes.color.set(start_color, start_alpha,
+                                                     end_color, end_alpha);
     }
 
-    inline void set_shadow_width_of_fold_edges(float min,
-                                               float max,
-                                               float ratio) {
-        m_fold_edge_shadow_width.set(min, max, ratio);
+    inline int set_shadow_color_of_fold_base(float start_color,
+                                             float start_alpha,
+                                             float end_color,
+                                             float end_alpha)
+    {
+        return m_fold_base_shadow_vertexes.color.set(start_color, start_alpha,
+                                                     end_color, end_alpha);
     }
 
-    inline void set_shadow_width_of_fold_base(float min,
+    inline int set_shadow_width_of_fold_edges(float min,
                                               float max,
-                                              float ratio) {
-        m_fold_base_shadow_width.set(min, max, ratio);
+                                              float ratio)
+    {
+        return m_fold_edge_shadow_width.set(min, max, ratio);
     }
 
-    inline int surface_width() {
+    inline int set_shadow_width_of_fold_base(float min,
+                                              float max,
+                                              float ratio)
+    {
+        return m_fold_base_shadow_width.set(min, max, ratio);
+    }
+
+    inline int surface_width()
+    {
         return (int) m_view_rect.surface_width;
     }
 
-    inline int surface_height() {
+    inline int surface_height()
+    {
         return (int) m_view_rect.surface_height;
     }
 
-    inline PageFlipState flip_state() {
+    inline PageFlipState flip_state()
+    {
         return m_flip_state;
     }
 
-    inline bool isAnimating() {
-        return true;//!mScroller.isFinished();
+    inline int pixels_of_mesh()
+    {
+        return m_pixels_of_mesh;
     }
 
-    inline bool is_started_flip() {
+    inline bool has_second_page()
+    {
+        return m_pages[SECOND_PAGE] != NULL;
+    }
+
+    inline bool is_first_texture_set(bool is_first_page)
+    {
+        return m_pages[is_first_page ? FIRST_PAGE : SECOND_PAGE]->textures
+                .is_first_texture_set();
+    }
+
+    inline bool is_second_texture_set(bool is_first_page)
+    {
+        return m_pages[is_first_page ? FIRST_PAGE : SECOND_PAGE]->textures
+                .is_second_texture_set();
+    }
+
+    inline bool is_back_texture_set(bool is_firts_page)
+    {
+        return m_pages[is_firts_page ? FIRST_PAGE : SECOND_PAGE]->textures
+                .is_back_texture_set();
+    }
+
+    inline int set_first_texture(bool is_first_page, AndroidBitmapInfo& info,
+                                 GLvoid* data)
+    {
+        return m_pages[is_first_page ? FIRST_PAGE : SECOND_PAGE]->textures
+                .set_first_texture(info, data);
+    }
+
+    inline int set_second_texture(bool is_first_page, AndroidBitmapInfo& info,
+                                  GLvoid* data)
+    {
+        return m_pages[is_first_page ? FIRST_PAGE : SECOND_PAGE]->textures
+                .set_second_texture(info, data);
+    }
+
+    inline int set_back_texture(bool is_first_page, AndroidBitmapInfo& info,
+                                GLvoid* data)
+    {
+        return m_pages[is_first_page ? FIRST_PAGE : SECOND_PAGE]->textures
+                .set_back_texture(info, data);
+    }
+
+    inline void set_first_texture_with_second(bool is_first_page)
+    {
+        return m_pages[is_first_page ? FIRST_PAGE : SECOND_PAGE]->textures
+                .set_first_texture_with_second();
+    }
+
+    inline void set_second_texture_with_first(bool is_first_page)
+    {
+        return m_pages[is_first_page ? FIRST_PAGE : SECOND_PAGE]->textures
+                .set_second_texture_with_first();
+    }
+
+    inline int swap_textures_with(bool is_first_page)
+    {
+        if (m_pages[SECOND_PAGE] == NULL) {
+            return g_error.set(Error::ERR_NO_TWO_PAGES);
+        }
+
+        Page& lhs = *m_pages[FIRST_PAGE];
+        Page& rhs = *m_pages[SECOND_PAGE];
+        if (!is_first_page) {
+            lhs = *m_pages[SECOND_PAGE];
+            rhs = *m_pages[FIRST_PAGE];
+        }
+        lhs.textures.swap_textures_with(rhs.textures);
+        return Error::OK;
+    }
+
+    inline void deleteUnusedTextures(bool is_first_page)
+    {
+        return m_pages[is_first_page ? FIRST_PAGE : SECOND_PAGE]->textures
+                .delete_unused_textures();
+    }
+
+    inline bool is_animating()
+    {
+        return !m_scroller.is_finished();
+    }
+
+    inline bool is_started_flip()
+    {
         return m_flip_state == BACKWARD_FLIP ||
                m_flip_state == FORWARD_FLIP ||
                m_flip_state == RESTORE_FLIP;
     }
 
-    inline bool is_ended_flip() {
+    inline bool is_ended_flip()
+    {
         return m_flip_state == END_FLIP ||
                m_flip_state == END_WITH_RESTORE ||
                m_flip_state == END_WITH_BACKWARD ||
                m_flip_state == END_WITH_FORWARD;
     }
 
-    inline void delete_unused_textures() {
-        m_first_page->textures.delete_unused_textures();
-        if (m_second_page) {
-            m_second_page->textures.delete_unused_textures();
+    inline void delete_unused_textures()
+    {
+        if (m_pages[FIRST_PAGE]) {
+            m_pages[FIRST_PAGE]->textures.delete_unused_textures();
+        }
+        if (m_pages[SECOND_PAGE]) {
+            m_pages[SECOND_PAGE]->textures.delete_unused_textures();
         }
     }
 
 private:
     void create_pages();
-
     void compute_scroll_points_for_clicking_flip(float x,
+                                                 bool can_forward,
+                                                 bool can_backward,
                                                  PointF &start,
                                                  PointF &end);
-
     void compute_max_mesh_count();
-
-    void create_gradient_light_texture();
-
     void compute_vertexes_build_page();
-
     void compute_key_vertexes_when_vertical();
-
     void compute_vertexes_when_vertical();
-
     void compute_key_vertexes_when_slope();
-
     void compute_vertexes_when_slope();
-
     void compute_back_vertex(bool is_x, float x0, float y0, float sx0,
                              float sy0, float xfx, float sin_a,
                              float cos_a, float tex_x, float tex_y,
                              float o_x, float o_y);
-
     void compute_back_vertex(float x0, float y0, float xfx,
                              float sin_a, float cos_a, float tex_x,
                              float tex_y, float o_x, float o_y);
-
     void compute_front_vertex(bool is_x, float x0, float y0, float xfx,
                               float sin_a, float cos_a, float base_w_cos_a,
                               float base_w_sin_a, float tex_x, float tex_y,
                               float o_x, float o_y);
-
     void compute_front_vertex(float x0, float y0, float xfx,
                               float sin_a, float cos_a,
                               float tex_x, float tex_y,
                               float o_x, float o_y);
-
     void compute_base_shadow_last_vertex(float x0, float y0, float xfs,
                                          float sin_a, float cos_a,
                                          float base_w_cos_a, float base_w_sin_a,
                                          float o_x, float o_y, float d_y);
-
     void compute_vertexes_of_fold_top_edge_shadow(float x0, float y0,
                                                   float sin_a, float cos_a,
                                                   float sx, float sy);
-
     void compute_mesh_count();
-
     float compute_tan_of_curl_angle(float dy);
 
 private:
@@ -283,7 +361,7 @@ private:
     int m_pixels_of_mesh;
 
     // gradient shadow texture id
-    int m_gradient_light_tid;
+    GLuint m_gradient_light_tid;
 
     // touch point and last touch point
     PointF m_touch_p;
@@ -383,8 +461,7 @@ private:
     // in single page mode, there is only one page in the index 0
     // in double pages mode, there are two pages, the first one is always active
     // page which is receiving finger events, for example: finger down/move/up
-    Page *m_first_page;
-    Page *m_second_page;
+    Page* m_pages[PAGES_SIZE];
     PageMode m_page_mode;
 
     // is clicking to flip page

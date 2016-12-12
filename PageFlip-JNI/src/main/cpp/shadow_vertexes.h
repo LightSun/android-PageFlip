@@ -29,43 +29,41 @@ public:
     ShadowVertexes(int space_of_front_rear,
                    float start_color, float start_alpha,
                    float end_color, float end_alpha);
-
     ~ShadowVertexes();
 
     void release();
-
     void set(int capacity);
-
-    ShadowVertexes &set_vertexes(int offset,
+    ShadowVertexes& set_vertexes(int offset,
                                  float start_x, float start_y,
                                  float end_x, float end_y);
-
-    ShadowVertexes &add_vertexes_backward(float start_x, float start_y,
+    ShadowVertexes& add_vertexes_backward(float start_x, float start_y,
                                           float end_x, float end_y);
-
-    ShadowVertexes &add_vertexes_forward(float start_x, float start_y,
+    ShadowVertexes& add_vertexes_forward(float start_x, float start_y,
                                          float end_x, float end_y);
-
     void draw(ShadowVertexProgram &program);
 
     // inline
-    inline void reset() {
+    inline void reset()
+    {
         m_vertex_z = 0;
         m_backward = m_max_backward;
         m_forward = m_max_backward + (m_space_of_front_rear << 2);
     }
 
-    inline int max_backward() {
+    inline int max_backward()
+    {
         return m_max_backward;
     }
 
-    inline void set_vertex_z(float z) {
+    inline void set_vertex_z(float z)
+    {
         m_vertex_z = z;
     }
 
-    inline ShadowVertexes &add_vertexes(bool is_forward,
+    inline ShadowVertexes& add_vertexes(bool is_forward,
                                         float start_x, float start_y,
-                                        float end_x, float end_y) {
+                                        float end_x, float end_y)
+    {
         return is_forward ?
                add_vertexes_forward(start_x, start_y, end_x, end_y) :
                add_vertexes_backward(start_x, start_y, end_x, end_y);

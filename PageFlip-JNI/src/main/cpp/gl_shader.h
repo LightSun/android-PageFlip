@@ -25,15 +25,14 @@ class GLShader {
 
 public:
     GLShader();
-
     ~GLShader();
 
-    void load(GLenum type, const char *shader_glsl);
-
+    int load(GLenum type, const char *shader_glsl);
     void clean();
 
     // inline
-    inline GLuint shader_ref() {
+    inline GLuint shader_ref()
+    {
         return m_shader_ref;
     }
 

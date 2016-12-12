@@ -20,36 +20,45 @@
 namespace eschao {
 
 static const auto g_vertex_shader =
+        "precision mediump float;\n"
         "uniform mat4 u_MVPMatrix;\n"
-                "uniform float u_vexZ;\n"
-                "attribute vec4 a_vexPosition;\n"
-                "varying vec4 v_texColor;\n"
-                "\n"
-                "void main() {\n"
-                "    vec4 vexPos = vec4(a_vexPosition.xy, u_vexZ, 1.0);\n"
-                "    v_texColor = vec4(a_vexPosition.z, a_vexPosition.z, a_vexPosition.z, a_vexPosition.w);\n"
-                "    gl_Position = u_MVPMatrix * vexPos;\n"
-                "}";
+        "uniform float u_vexZ;\n"
+        "attribute vec4 a_vexPosition;\n"
+        "varying vec4 v_texColor;\n"
+        "\n"
+        "void main() {\n"
+        "    vec4 vexPos = vec4(a_vexPosition.xy, u_vexZ, 1.0);\n"
+        "    v_texColor = vec4(a_vexPosition.z, a_vexPosition.z, a_vexPosition.z, a_vexPosition.w);\n"
+        "    gl_Position = u_MVPMatrix * vexPos;\n"
+        "}";
 
 static const auto g_fragment_shader =
+        "precision mediump float;\n"
         "varying vec4 v_texColor;\n"
-                "\n"
-                "void main()\n"
-                "{\n"
-                "    gl_FragColor = v_texColor;\n"
-                "}";
+        "\n"
+        "void main()\n"
+        "{\n"
+        "    gl_FragColor = v_texColor;\n"
+        "}";
+
+static const char *VAR_MVP_MATRIX = "u_MVPMatrix";
+static const char *VAR_VERTEX_Z = "u_vexZ";
+static const char *VAR_VERTEX_POS = "a_vexPosition";
 
 ShadowVertexProgram::ShadowVertexProgram()
         : m_mvp_matrix_loc(Constant::kGlInValidLocation),
           m_vertex_z_loc(Constant::kGlInValidLocation),
-          m_vertex_pos_loc(Constant::kGlInValidLocation) {
+          m_vertex_pos_loc(Constant::kGlInValidLocation)
+{
 }
 
-ShadowVertexProgram::~ShadowVertexProgram() {
+ShadowVertexProgram::~ShadowVertexProgram()
+{
     clean();
 }
 
-void ShadowVertexProgram::clean() {
+void ShadowVertexProgram::clean()
+{
     m_mvp_matrix_loc = Constant::kGlInValidLocation;
     m_vertex_z_loc = Constant::kGlInValidLocation;
     m_vertex_pos_loc = Constant::kGlInValidLocation;
@@ -57,11 +66,13 @@ void ShadowVertexProgram::clean() {
     GLProgram::clean();
 }
 
-void ShadowVertexProgram::init() {
-    GLProgram::init(g_vertex_shader, g_fragment_shader);
+int ShadowVertexProgram::init()
+{
+    return GLProgram::init(g_vertex_shader, g_fragment_shader);
 }
 
-void ShadowVertexProgram::get_vars_location() {
+void ShadowVertexProgram::get_vars_location()
+{
     m_vertex_z_loc = glGetUniformLocation(m_program_ref, VAR_VERTEX_Z);
     m_mvp_matrix_loc = glGetUniformLocation(m_program_ref, VAR_MVP_MATRIX);
     m_vertex_pos_loc = glGetAttribLocation(m_program_ref, VAR_VERTEX_POS);

@@ -19,11 +19,12 @@
 
 #include <GLES2/gl2.h>
 #include <string.h>
-#include <jni.h>
+#include <android/bitmap.h>
 #include "gl_point.h"
 #include "vertex_program.h"
 #include "vertexes.h"
 #include "pointf.h"
+#include "error.h"
 
 #define FIRST_TEXTURE_ID    0
 #define SECOND_TEXTURE_ID   1
@@ -40,60 +41,86 @@ class PageFlip;
 class Textures {
 
 public:
-    Textures::Textures() : unused_ids_size(0) {
-        memset(is_used, false, sizeof(bool) * TEXTURE_SIZE);
+    Textures() : m_unused_ids_size(0)
+    {
+        memset(m_is_used, false, sizeof(bool) * TEXTURE_SIZE);
     }
 
     void set_first_texture_with_second();
-
     void set_second_texture_with_first();
-
     void swap_textures_with(Textures &rhs);
 
-    void set_first_texture(jobject bitmap);
-
-    void set_second_texture(jobject bitmap);
-
-    void set_back_texture(jobject bitmap);
-
-    inline GLuint back_texture_id() {
-        return is_used[BACK_TEXTURE_ID] ?
-               used_ids[BACK_TEXTURE_ID] :
-               used_ids[FIRST_TEXTURE_ID];
+    inline GLuint back_texture_id()
+    {
+        return m_is_used[BACK_TEXTURE_ID] ?
+               m_used_ids[BACK_TEXTURE_ID] :
+               m_used_ids[FIRST_TEXTURE_ID];
     }
 
-    inline bool is_first_texture_set() {
-        return is_used[FIRST_TEXTURE_ID];
+    inline bool is_first_texture_set()
+    {
+        return m_is_used[FIRST_TEXTURE_ID];
     }
 
-    inline bool is_second_texture_set() {
-        return is_used[SECOND_TEXTURE_ID];
+    inline bool is_second_texture_set()
+    {
+        return m_is_used[SECOND_TEXTURE_ID];
     }
 
-    inline bool is_back_texture_set() {
-        return is_used[BACK_TEXTURE_ID];
+    inline bool is_back_texture_set()
+    {
+        return m_is_used[BACK_TEXTURE_ID];
     }
 
-    inline void delete_unused_textures() {
-        if (unused_ids_size > 0) {
-            glDeleteTextures(unused_ids_size, unused_ids);
-            unused_ids_size = 0;
+    inline void delete_unused_textures()
+    {
+        if (m_unused_ids_size > 0) {
+            glDeleteTextures(m_unused_ids_size, m_unused_ids);
+            m_unused_ids_size = 0;
         }
     }
 
     inline void delete_all() {
-        glDeleteTextures(TEXTURE_SIZE, used_ids);
-        memset(is_used, false, sizeof(bool) * TEXTURE_SIZE);
+        glDeleteTextures(TEXTURE_SIZE, m_used_ids);
+        memset(m_is_used, false, sizeof(bool) * TEXTURE_SIZE);
     }
+
+    inline int set_first_texture(AndroidBitmapInfo& info, GLvoid* data)
+    {
+        return set_texture(FIRST_TEXTURE_ID, info, data);
+    }
+
+    inline int set_second_texture(AndroidBitmapInfo& info, GLvoid* data)
+    {
+        return set_texture(SECOND_TEXTURE_ID, info, data);
+    }
+
+    inline int set_back_texture(AndroidBitmapInfo& info, GLvoid* data)
+    {
+        if (data == NULL) {
+            // recycle back texture
+            if (m_is_used[BACK_TEXTURE_ID]) {
+                m_used_ids[m_unused_ids_size++] = m_used_ids[BACK_TEXTURE_ID];
+            }
+
+            m_is_used[BACK_TEXTURE_ID] = false;
+            return Error::OK;
+        }
+
+        return set_texture(BACK_TEXTURE_ID, info, data);
+    }
+
+private:
+    int set_texture(int index, AndroidBitmapInfo& info, GLvoid* data);
 
 public:
     float mask_color[TEXTURE_SIZE][3];
 
 private:
-    GLuint used_ids[TEXTURE_SIZE];
-    GLuint unused_ids[TEXTURE_SIZE];
-    bool is_used[TEXTURE_SIZE];
-    int unused_ids_size;
+    GLuint m_used_ids[TEXTURE_SIZE];
+    GLuint m_unused_ids[TEXTURE_SIZE];
+    bool m_is_used[TEXTURE_SIZE];
+    int m_unused_ids_size;
 
     friend class Page;
 };
@@ -105,76 +132,78 @@ class Page {
 
 public:
     Page();
-
     Page(float left, float right, float top, float bottom);
 
+    void init(float left, float right, float top, float bottom);
     void set_origin_diagonal_points(bool has_second_page, bool is_top_area);
-
     void invert_y_of_origin_p();
-
     void draw_front_page(VertexProgram &program, Vertexes &vertexes);
-
-    void build_vertexes_of_page_when_veritcal(Vertexes &front_vertexes,
+    void build_vertexes_of_page_when_vertical(Vertexes &front_vertexes,
                                               PointF &x_fold_p1);
-
     void build_vertexes_of_page_when_slope(Vertexes &front_vertexes,
                                            PointF &x_fold_p1,
                                            PointF &y_fold_p1,
                                            float k_value);
-
     void build_vertexes_of_full_page();
 
-    inline float width() {
+    inline float width()
+    {
         return m_width;
     }
 
-    inline float height() {
+    inline float height()
+    {
         return m_height;
     }
 
-    inline bool is_left_page() {
+    inline bool is_left_page()
+    {
         return m_right <= 0;
     }
 
-    inline bool is_right_page() {
+    inline bool is_right_page()
+    {
         return m_left >= 0;
     }
 
-    inline bool contains(float x, float y) {
+    inline bool contains(float x, float y)
+    {
         return m_left < m_right && m_bottom < m_top &&
                m_left <= x && x < m_right &&
                m_bottom <= y && y < m_top;
     }
 
-    inline bool is_x_in_range(float x, float ratio) {
+    inline bool is_x_in_range(float x, float ratio)
+    {
         const float w = m_width * ratio;
         return (m_origin_p.x < 0) ? x < (m_origin_p.x + w) :
                x > (m_origin_p.x - w);
     }
 
-    inline bool is_x_outside_page(float x) {
+    inline bool is_x_outside_page(float x)
+    {
         return (m_origin_p.x < 0) ? x > m_diagonal_p.x : x < m_diagonal_p.x;
     }
 
-    inline float texture_x(float x) {
-        return (x - m_left) ? m_tex_width;
+    inline float texture_x(float x)
+    {
+        return (x - m_left) / m_tex_width;
     }
 
-    inline float texture_y(float y) {
+    inline float texture_y(float y)
+    {
         return (m_top - y) / m_tex_height;
     }
 
-    inline void draw_full_page(VertexProgram &program, bool is_first) {
+    inline void draw_full_page(VertexProgram &program, bool is_first)
+    {
         is_first ?
-        draw_full_page(program, textures.used_ids[FIRST_TEXTURE_ID]) :
-        draw_full_page(program, textures.used_ids[SECOND_TEXTURE_ID]);
+        draw_full_page(program, textures.m_used_ids[FIRST_TEXTURE_ID]) :
+        draw_full_page(program, textures.m_used_ids[SECOND_TEXTURE_ID]);
     }
 
 private:
-    void init(float left, float right, float top, float bottom);
-
     void compute_index_of_apex_order();
-
     void draw_full_page(VertexProgram &program, GLuint texture_id);
 
 public:
@@ -213,12 +242,7 @@ private:
      *      </ul></li>
      *  </ul>
      */
-    static const int m_page_apex_orders[][4] = {
-            {0, 1, 2, 3}, // for case A
-            {1, 0, 3, 2}, // for case B
-            {2, 3, 0, 1}, // for case C
-            {3, 2, 1, 0}, // for case D
-    };
+    static const int m_page_apex_orders[][4];
 
     /**
      * <p>When page is curled, there are 4 kinds of m_vertexes orders for drawing
@@ -251,13 +275,7 @@ private:
      *      second texture</li>
      * </ul>
      */
-    static const int m_fold_vex_orders[][5] = {
-            {4, 3, 1, 2, 0}, // Case A
-            {3, 3, 2, 0, 1}, // Case B
-            {3, 2, 1, 3, 0}, // Case C
-            {2, 2, 3, 1, 0}, // Case D
-            {1, 0, 1, 3, 2}, // Case E
-    };
+    static const int m_fold_vex_orders[][5];
 
     static const int VEX_ORDER_LEN = sizeof(m_fold_vex_orders[0]) / sizeof(int);
 

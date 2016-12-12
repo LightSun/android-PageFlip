@@ -20,17 +20,19 @@
 
 namespace eschao {
 
-BackOfFoldVertexes::BackOfFoldVertexes() {
+BackOfFoldVertexes::BackOfFoldVertexes()
+{
 }
 
-BackOfFoldVertexes::~BackOfFoldVertexes() {
-
+BackOfFoldVertexes::~BackOfFoldVertexes()
+{
 }
 
 void BackOfFoldVertexes::draw(BackOfFoldVertexProgram &program,
                               Page &page,
                               bool has_second_page,
-                              GLuint gradient_light_id) {
+                              GLuint gradient_light_id)
+{
     glUniformMatrix4fv(program.get_mask_color_loc(), 1, GL_FALSE,
                        VertexProgram::mvp_matrix);
     glBindTexture(GL_TEXTURE_2D, page.textures.back_texture_id());

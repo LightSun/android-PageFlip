@@ -26,22 +26,23 @@ class ShadowVertexProgram : public GLProgram {
 
 public:
     ShadowVertexProgram();
-
     ~ShadowVertexProgram();
 
-    void init();
-
+    int init();
     void clean();
 
-    inline GLint mvp_matrix_loc() {
+    inline GLint mvp_matrix_loc()
+    {
         return m_mvp_matrix_loc;
     }
 
-    inline GLint vertex_z_loc() {
+    inline GLint vertex_z_loc()
+    {
         return m_vertex_z_loc;
     }
 
-    inline GLint vertex_pos_loc() {
+    inline GLint vertex_pos_loc()
+    {
         return m_vertex_pos_loc;
     }
 
@@ -49,10 +50,6 @@ protected:
     void get_vars_location();
 
 protected:
-    static const char *VAR_MVP_MATRIX = "u_MVPMatrix";
-    static const char *VAR_VERTEX_Z = "u_vexZ";
-    static const char *VAR_VERTEX_POS = "a_vexPosition";
-
     GLint m_mvp_matrix_loc;
     GLint m_vertex_z_loc;
     GLint m_vertex_pos_loc;

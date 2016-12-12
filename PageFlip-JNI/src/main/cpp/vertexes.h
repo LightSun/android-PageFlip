@@ -19,7 +19,6 @@
 
 #include <GLES2/gl2.h>
 #include "gl_point.h"
-#include "pageflip_exception.h"
 
 namespace eschao {
 
@@ -27,49 +26,44 @@ class Vertexes {
 
 public:
     Vertexes();
-
     Vertexes(int capacity, int size_of_per_vex, bool has_texture = false);
-
     virtual ~Vertexes();
 
     void release();
-
-    void set(int capacity, int size_of_per_vex, bool has_texture = false);
-
-    Vertexes &add_vertex(float x, float y, float z);
-
-    Vertexes &add_vertex(float x, float y, float z, float w);
-
-    Vertexes &add_vertex(float x, float y, float z, float tx, float ty);
-
-    Vertexes &add_vertex(float x, float y, float z, float w,
+    int set(int capacity, int size_of_per_vex, bool has_texture = false);
+    Vertexes& add_vertex(float x, float y, float z);
+    Vertexes& add_vertex(float x, float y, float z, float w);
+    Vertexes& add_vertex(float x, float y, float z, float tx, float ty);
+    Vertexes& add_vertex(float x, float y, float z, float w,
                          float tx, float ty);
-
-    Vertexes &add_vertex(GLPoint &p);
-
+    Vertexes& add_vertex(GLPoint &p);
     void draw_with(GLenum type, GLint vertex_pos_loc, GLint tex_coord_loc);
-
     void draw_with(GLenum type, GLint vertex_pos_loc, GLint tex_coord_loc,
                    int offset, int length);
 
     // inline
-    inline int capacity() {
+    inline int capacity()
+    {
         return m_capacity;
     };
 
-    inline int count() {
+    inline int count()
+    {
         return m_next / m_size_of_per_vex;
     }
 
-    inline int size_of_per_vex() {
+    inline int size_of_per_vex()
+    {
         return m_size_of_per_vex;
     }
 
-    inline void reset() {
+    inline void reset()
+    {
         m_next = 0;
     }
 
-    inline float float_at(int index) {
+    inline float float_at(int index)
+    {
         return (index >= 0 && index < m_next) ? m_vertexes[index] : 0;
     }
 
@@ -78,8 +72,8 @@ protected:
     int m_capacity;
     int m_next;
 
-    float *m_vertexes;
-    float *m_tex_coords;
+    float* m_vertexes;
+    float* m_tex_coords;
 };
 
 }

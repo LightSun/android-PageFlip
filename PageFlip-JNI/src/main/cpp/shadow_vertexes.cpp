@@ -27,22 +27,26 @@ ShadowVertexes::ShadowVertexes(int space_of_front_rear,
           m_backward(0),
           m_forward(0),
           m_max_backward(0),
-          m_vertexes(NULL) {
+          m_vertexes(NULL)
+{
     color.set(start_color, start_alpha, end_color, end_alpha);
 }
 
-ShadowVertexes::~ShadowVertexes() {
+ShadowVertexes::~ShadowVertexes()
+{
     release();
 }
 
-void ShadowVertexes::set(int mesh_count) {
+void ShadowVertexes::set(int mesh_count)
+{
     m_max_backward = mesh_count << 3;
     m_capacity = (mesh_count << 4) + (m_space_of_front_rear << 2);
     m_vertexes = new float[m_capacity];
     reset();
 }
 
-void ShadowVertexes::release() {
+void ShadowVertexes::release()
+{
     if (m_vertexes) {
         delete[] m_vertexes;
     }
@@ -54,9 +58,10 @@ void ShadowVertexes::release() {
     m_capacity = 0;
 }
 
-ShadowVertexes &ShadowVertexes::set_vertexes(int offset,
+ShadowVertexes& ShadowVertexes::set_vertexes(int offset,
                                              float start_x, float start_y,
-                                             float end_x, float end_y) {
+                                             float end_x, float end_y)
+{
     m_vertexes[offset++] = start_x;
     m_vertexes[offset++] = start_y;
     m_vertexes[offset++] = color.start_color;
@@ -68,10 +73,11 @@ ShadowVertexes &ShadowVertexes::set_vertexes(int offset,
     return *this;
 }
 
-ShadowVertexes &ShadowVertexes::add_vertexes_backward(float start_x,
+ShadowVertexes& ShadowVertexes::add_vertexes_backward(float start_x,
                                                       float start_y,
                                                       float end_x,
-                                                      float end_y) {
+                                                      float end_y)
+{
     m_vertexes[--m_backward] = start_x;
     m_vertexes[--m_backward] = start_y;
     m_vertexes[--m_backward] = color.start_color;
@@ -83,10 +89,11 @@ ShadowVertexes &ShadowVertexes::add_vertexes_backward(float start_x,
     return *this;
 }
 
-ShadowVertexes &ShadowVertexes::add_vertexes_forward(float start_x,
+ShadowVertexes& ShadowVertexes::add_vertexes_forward(float start_x,
                                                      float start_y,
                                                      float end_x,
-                                                     float end_y) {
+                                                     float end_y)
+{
     m_vertexes[m_forward++] = start_x;
     m_vertexes[m_forward++] = start_y;
     m_vertexes[m_forward++] = color.start_color;
@@ -98,7 +105,8 @@ ShadowVertexes &ShadowVertexes::add_vertexes_forward(float start_x,
     return *this;
 }
 
-void ShadowVertexes::draw(ShadowVertexProgram &program) {
+void ShadowVertexes::draw(ShadowVertexProgram &program)
+{
     int count = (m_forward - m_backward) >> 2;
     if (count > 0) {
         glUniformMatrix4fv(program.mvp_matrix_loc(), 1, GL_FALSE,

@@ -20,9 +20,10 @@ namespace eschao {
 
 #define I(_i, _j) ((_j)+((_i)<<2))
 
-static void Matrix::ortho(float *m,
-                          float left, float right, float bottom, float top,
-                          float near, float far) {
+void Matrix::ortho(float *m,
+                   float left, float right, float bottom, float top,
+                   float near, float far)
+{
     float r_width = 1.0f / (right - left);
     float r_height = 1.0f / (top - bottom);
     float r_depth = 1.0f / (far - near);
@@ -51,7 +52,8 @@ static void Matrix::ortho(float *m,
     m[11] = 0.0f;
 }
 
-static void Matrix::set_identity(float *m) {
+void Matrix::set_identity(float *m)
+{
     for (int i = 0; i < 16; ++i) {
         m[i] = 0;
     }
@@ -61,10 +63,11 @@ static void Matrix::set_identity(float *m) {
     }
 }
 
-static void Matrix::set_look_at(float *m,
-                                float eye_x, float eye_y, float eye_z,
-                                float center_x, float center_y, float center_z,
-                                float up_x, float up_y, float up_z) {
+void Matrix::set_look_at(float *m,
+                         float eye_x, float eye_y, float eye_z,
+                         float center_x, float center_y, float center_z,
+                         float up_x, float up_y, float up_z)
+{
     float fx = center_x - eye_x;
     float fy = center_y - eye_y;
     float fz = center_z - eye_z;
@@ -102,13 +105,15 @@ static void Matrix::set_look_at(float *m,
     translate(m, -eye_x, -eye_y, -eye_z);
 }
 
-static void Matrix::translate(float *m, float x, float y, float z) {
+void Matrix::translate(float *m, float x, float y, float z)
+{
     for (int i = 0; i < 4; ++i) {
         m[12 + i] += m[i] * x + m[4 + i] * y + m[8 + i] * z;
     }
 }
 
-static void Matrix::multiply_mm(float *m, float *lhs, float *rhs) {
+void Matrix::multiply_mm(float *m, float *lhs, float *rhs)
+{
     for (int i = 0; i < 4; i++) {
         register const float rhs_i0 = rhs[I(i, 0)];
         register float ri0 = lhs[I(0, 0)] * rhs_i0;

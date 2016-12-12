@@ -31,7 +31,8 @@ public:
     GLPoint(float x, float y, float z, float tex_x, float tex_y)
             : x(x), y(y), z(z), tex_x(tex_x), tex_y(tex_y) { }
 
-    inline void set(float x, float y, float z, float tex_x, float tex_y) {
+    inline void set(float x, float y, float z, float tex_x, float tex_y)
+    {
         this->x = x;
         this->y = y;
         this->z = z;

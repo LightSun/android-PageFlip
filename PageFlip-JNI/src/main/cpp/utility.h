@@ -14,39 +14,27 @@
  * limitations under the License.
  */
 
-#ifndef ANDROID_PAGEFLIP_GLPROGRAM_H
-#define ANDROID_PAGEFLIP_GLPROGRAM_H
+#ifndef ANDROID_PAGEFLIP_UTILITY_H
+#define ANDROID_PAGEFLIP_UTILITY_H
 
 #include <GLES2/gl2.h>
-#include "gl_shader.h"
+#include <android/bitmap.h>
 
 namespace eschao {
 
-class GLShader;
+#define RED(clr) ((clr >> 16) & 0xFF)
+#define GREEN(clr) ((clr >> 8) & 0xFF)
+#define BLUE(clr) (clr & 0xFF)
+#define ALPHA(clr) (clr >> 24)
+#define ARGB(a, r, g, b) ((a << 24) | (r << 16) | (g << 8) | b)
 
-class GLProgram {
+#define LOGE(TAG, ...) __android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__)
+#define LOGV(TAG, ...) __android_log_print(ANDROID_LOG_VERBOSE, TAG, __VA_ARGS__)
 
-public:
-    GLProgram();
-    virtual ~GLProgram();
 
-    virtual int init(const char *shader_glsl, const char *fragment_glsl);
-    virtual void clean();
-
-    // inline
-    inline int program_ref()
-    {
-        return m_program_ref;
-    }
-
-protected:
-    virtual void get_vars_location() = 0;
-
-protected:
-    GLuint m_program_ref;
-    GLShader m_shader;
-    GLShader m_fragment;
-};
+extern int compute_average_color(AndroidBitmapInfo& info,
+                                 GLvoid* data,
+                                 int count);
 
 }
-#endif //ANDROID_PAGEFLIP_GLPROGRAM_H
+#endif //ANDROID_PAGEFLIP_UTILITY_H

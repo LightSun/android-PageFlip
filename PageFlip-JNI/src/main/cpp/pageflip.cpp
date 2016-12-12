@@ -31,8 +31,6 @@ PageFlip::PageFlip()
           m_width_ratio_of_click_to_flip(kWidthRatioOfClickToFlip),
           m_scroller(new AccelerateInterpolator()),
           m_page_mode(SINGLE_PAGE_MODE),
-          m_first_page(NULL),
-          m_second_page(NULL),
           m_fold_edge_shadow_width(5, 30, 0.25f),
           m_fold_base_shadow_width(2, 40, 0.4f),
           m_fold_edge_shadow_vertexes(kFoldTopEdgeShadowVexCount,
@@ -50,12 +48,12 @@ PageFlip::PageFlip()
 
 PageFlip::~PageFlip()
 {
-    if (m_first_page) {
-        delete m_first_page;
+    if (m_pages[FIRST_PAGE]) {
+        delete m_pages[FIRST_PAGE];
     }
 
-    if (m_second_page) {
-        delete m_second_page;
+    if (m_pages[SECOND_PAGE]) {
+        delete m_pages[SECOND_PAGE];
     }
 }
 
@@ -67,8 +65,8 @@ bool PageFlip::enable_auto_page(bool is_auto)
 
         if ((new_mode == AUTO_PAGE_MODE &&
              m_view_rect.surface_width > m_view_rect.surface_height &&
-             m_second_page == NULL) ||
-            (new_mode == SINGLE_PAGE_MODE && m_second_page != NULL)) {
+             m_pages[SECOND_PAGE] == NULL) ||
+            (new_mode == SINGLE_PAGE_MODE && m_pages[SECOND_PAGE] != NULL)) {
             create_pages();
             return true;
         }
@@ -77,23 +75,22 @@ bool PageFlip::enable_auto_page(bool is_auto)
     return false;
 }
 
-void PageFlip::on_surface_created()
+int PageFlip::on_surface_created()
 {
-    glClearColor(0, 0, 0, 1f);
+    glClearColor(0, 0, 0, 1);
     glClearDepthf(1.0f);
     glEnable(GL_DEPTH_TEST);
 
-    try {
-        m_vertex_prog.init();
-        m_shadow_vertex_prog.init();
-        m_back_of_fold_vertex_prog.init();
-    }
-    catch (PageFlipException& e) {
+    if (m_vertex_prog.init() != Error::OK ||
+        m_shadow_vertex_prog.init() != Error::OK ||
+        m_back_of_fold_vertex_prog.init() != Error::OK) {
         m_vertex_prog.clean();
         m_shadow_vertex_prog.clean();
         m_back_of_fold_vertex_prog.clean();
-        throw e;
+        return g_error.code();
     }
+
+    return Error::OK;
 }
 
 void PageFlip::on_surface_changed(int width, int height)
@@ -110,38 +107,41 @@ void PageFlip::on_surface_changed(int width, int height)
 
 void PageFlip::create_pages()
 {
-    if (m_first_page) {
-        m_first_page->textures.delete_all();
+    if (m_pages[FIRST_PAGE]) {
+        m_pages[FIRST_PAGE]->textures.delete_all();
+        delete m_pages[FIRST_PAGE];
+        m_pages[FIRST_PAGE] = NULL;
     }
 
-    if (m_second_page) {
-        m_second_page->textures.delete_all();
+    if (m_pages[SECOND_PAGE]) {
+        m_pages[SECOND_PAGE]->textures.delete_all();
+        delete m_pages[SECOND_PAGE];
+        m_pages[SECOND_PAGE] = NULL;
     }
 
     if (m_page_mode == AUTO_PAGE_MODE &&
         m_view_rect.surface_width > m_view_rect.surface_height) {
-        m_first_page = new Page(m_view_rect.left, 0, m_view_rect.top,
-                                m_view_rect.bottom);
-        m_second_page = new Page(0, m_view_rect.right, m_view_rect.top,
-                                 m_view_rect.bottom);
+        m_pages[FIRST_PAGE] = new Page(m_view_rect.left, 0, m_view_rect.top,
+                                       m_view_rect.bottom);
+        m_pages[SECOND_PAGE] = new Page(0, m_view_rect.right, m_view_rect.top,
+                                        m_view_rect.bottom);
     }
     else {
-        m_first_page = new Page(m_view_rect.left, m_view_rect.right,
-                                m_view_rect.top, m_view_rect.bottom);
-        m_second_page = NULL;
+        m_pages[FIRST_PAGE] = new Page(m_view_rect.left, m_view_rect.right,
+                                       m_view_rect.top, m_view_rect.bottom);
     }
 }
 
-void PageFlip::on_finger_down(float x, float y)
+bool PageFlip::on_finger_down(float x, float y)
 {
     x = m_view_rect.to_opengl_x(x);
     y = m_view_rect.to_opengl_y(y);
 
-    bool is_contained = m_first_page->contains(x, y);
-    if (!is_contained && m_second_page &&
-        m_second_page->contains(x, y)) {
+    bool is_contained = m_pages[FIRST_PAGE]->contains(x, y);
+    if (!is_contained && m_pages[SECOND_PAGE] &&
+        m_pages[SECOND_PAGE]->contains(x, y)) {
         is_contained = true;
-        std::swap(m_first_page, m_second_page);
+        std::swap(m_pages[FIRST_PAGE], m_pages[SECOND_PAGE]);
     }
 
     if (is_contained) {
@@ -152,9 +152,12 @@ void PageFlip::on_finger_down(float x, float y)
         m_touch_p.set(x, y);
         m_flip_state = BEGIN_FLIP;
     }
+
+    return is_contained;
 }
 
-bool PageFlip::on_finger_move(float x, float y)
+bool PageFlip::on_finger_move(float x, float y,
+                              bool can_forward, bool can_backward)
 {
     x = m_view_rect.to_opengl_x(x);
     y = m_view_rect.to_opengl_y(y);
@@ -162,12 +165,12 @@ bool PageFlip::on_finger_move(float x, float y)
     float dy = (y - m_start_touch_p.y);
     float dx = (x - m_start_touch_p.x);
 
-    Page& page = *m_first_page;
+    Page& page = *m_pages[FIRST_PAGE];
     const GLPoint& origin_p = page.m_origin_p;
     const GLPoint& diagonal_p = page.m_diagonal_p;
 
     if (m_flip_state == BEGIN_FLIP && (fabs(dx) > m_view_rect.half_width)) {
-        page.set_origin_diagonal_points(m_second_page != NULL, dy > 0);
+        page.set_origin_diagonal_points(m_pages[SECOND_PAGE] != NULL, dy > 0);
 
         // compute max degree between X axis and line from TouchP to OriginP
         // and max degree between X axis and line from TouchP to
@@ -188,17 +191,13 @@ bool PageFlip::on_finger_move(float x, float y)
         }
 
         // determine if it is moving m_backward or m_forward
-        if (m_second_page == NULL && dx > 0)
-            //mListener != null &&
-            //mListener.canFlipBackward())
-            {
+        if (m_pages[SECOND_PAGE] == NULL && dx > 0 && can_backward) {
             m_start_touch_p.x = origin_p.x;
             dx = (x - m_start_touch_p.x);
             m_flip_state = BACKWARD_FLIP;
         }
-        else if (//mListener != null &&
-                 //mListener.canFlipForward() &&
-                 (dx < 0 && origin_p.x > 0 || dx > 0 && origin_p.x < 0)) {
+        else if (can_forward &&
+                ((dx < 0 && origin_p.x > 0) || (dx > 0 && origin_p.x < 0))) {
             m_flip_state = FORWARD_FLIP;
         }
     }
@@ -209,7 +208,7 @@ bool PageFlip::on_finger_move(float x, float y)
         m_flip_state == RESTORE_FLIP) {
 
         // check if page is flipping vertically
-        m_is_vertical = fabs(dy) <= 1f;
+        m_is_vertical = fabs(dy) <= 1;
 
         // multiply a factor to make sure the touch point is always head of
         // finger point
@@ -277,11 +276,12 @@ bool PageFlip::on_finger_move(float x, float y)
     return false;
 }
 
-bool PageFlip::on_finger_up(float x, float y, int duration) {
+bool PageFlip::on_finger_up(float x, float y, int duration,
+                            bool can_forward, bool can_backward) {
     x = m_view_rect.to_opengl_x(x);
     y = m_view_rect.to_opengl_y(y);
 
-    Page& page = *m_first_page;
+    Page& page = *m_pages[FIRST_PAGE];
     const GLPoint& origin_p = page.m_origin_p;
     const GLPoint& diagonal_p = page.m_diagonal_p;
     PointF start(m_touch_p);
@@ -294,7 +294,7 @@ bool PageFlip::on_finger_up(float x, float y, int duration) {
             end.x = origin_p.x;
             m_flip_state = RESTORE_FLIP;
         }
-        else if (m_second_page && origin_p.x < 0) {
+        else if (m_pages[SECOND_PAGE] && origin_p.x < 0) {
             end.x = diagonal_p.x + page.m_width;
         }
         else {
@@ -319,11 +319,14 @@ bool PageFlip::on_finger_up(float x, float y, int duration) {
     else if (m_flip_state == BEGIN_FLIP) {
         m_is_vertical = false;
         m_flip_state = END_FLIP;
-        page.set_origin_diagonal_points(m_second_page != NULL, -y > 0);
+        page.set_origin_diagonal_points(m_pages[SECOND_PAGE] != NULL, -y > 0);
 
         // if enable clicking to flip, compute scroller points for animation
         if (m_is_click_to_flip && fabs(x - m_start_touch_p.x) < 2) {
-            compute_scroll_points_for_clicking_flip(x, start, end);
+            compute_scroll_points_for_clicking_flip(x,
+                                                    can_forward,
+                                                    can_backward,
+                                                    start, end);
         }
     }
 
@@ -342,17 +345,19 @@ bool PageFlip::on_finger_up(float x, float y, int duration) {
 
 bool PageFlip::can_animate(float x, float y) {
     return (m_flip_state == FORWARD_FLIP &&
-            !m_first_page->contains(m_view_rect.to_opengl_x(x),
-                                   m_view_rect.to_opengl_y(y)));
+            !m_pages[FIRST_PAGE]->contains(m_view_rect.to_opengl_x(x),
+                                           m_view_rect.to_opengl_y(y)));
 }
 
 void PageFlip::compute_scroll_points_for_clicking_flip(float x,
+                                                       bool can_forward,
+                                                       bool can_backward,
                                                        PointF& start,
                                                        PointF& end) {
-    Page& page = *m_first_page;
+    Page& page = *m_pages[FIRST_PAGE];
     GLPoint& origin_p = page.m_origin_p;
     GLPoint& diagonal_p = page.m_diagonal_p;
-    bool has_second_page = m_second_page != NULL;
+    bool has_second_page = m_pages[SECOND_PAGE] != NULL;
 
     // m_forward and m_backward flip have different degree
     float tan_of_forward_angle = kMaxTanOfForwardFlip;
@@ -365,10 +370,8 @@ void PageFlip::compute_scroll_points_for_clicking_flip(float x,
 
     // m_backward flip
     if (!has_second_page &&
-        x < diagonal_p.x + page.m_width * m_width_ratio_of_click_to_flip) //&&
-        //mListener != null &&
-        //mListener.canFlipBackward()) {
-        {
+        x < diagonal_p.x + page.m_width * m_width_ratio_of_click_to_flip &&
+        can_backward) {
         m_flip_state = BACKWARD_FLIP;
         m_k_value = tan_of_backward_angle;
         start.set(diagonal_p.x,
@@ -376,9 +379,7 @@ void PageFlip::compute_scroll_points_for_clicking_flip(float x,
         end.set(origin_p.x - 5, origin_p.y);
     }
     // m_forward flip
-    else if (//mListener != null &&
-             //mListener.canFlipForward() &&
-             page.is_x_in_range(x, kWidthRatioOfClickToFlip)) {
+    else if (can_forward && page.is_x_in_range(x, kWidthRatioOfClickToFlip)) {
         m_flip_state = FORWARD_FLIP;
         m_k_value = tan_of_forward_angle;
 
@@ -391,7 +392,7 @@ void PageFlip::compute_scroll_points_for_clicking_flip(float x,
         }
 
         // compute start.y
-        start.y = origin_p.y + (start.x - origin_p.x) * m_k_value);
+        start.y = origin_p.y + (start.x - origin_p.x) * m_k_value;
 
         // compute end.x
         // left page in double page mode
@@ -413,7 +414,7 @@ void PageFlip::compute_scroll_points_for_clicking_flip(float x,
  */
 bool PageFlip::animating()
 {
-    Page& page = *m_first_page;
+    Page& page = *m_pages[FIRST_PAGE];
     const GLPoint& origin_p = page.m_origin_p;
     const GLPoint& diagonal_p = page.m_diagonal_p;
 
@@ -433,7 +434,7 @@ bool PageFlip::animating()
         }
         // check if flip is vertical
         else {
-            m_is_vertical = fabs(m_touch_p.y - origin_p.y) < 1f;
+            m_is_vertical = fabs(m_touch_p.y - origin_p.y) < 1;
         }
 
         // compute middle point
@@ -449,7 +450,7 @@ bool PageFlip::animating()
         }
 
         // in double page mode
-        if (m_second_page) {
+        if (m_pages[SECOND_PAGE]) {
             // if the xFoldP1.x is outside page width, need to limit
             // xFoldP1.x is in page.width and recompute new key points so
             // that the page flip is still going m_forward
@@ -532,15 +533,17 @@ void PageFlip::draw_flip_frame()
     // 1. draw back of fold page
     glUseProgram(m_back_of_fold_vertex_prog.program_ref());
     glActiveTexture(GL_TEXTURE0);
-    m_back_of_fold_vertexes.draw(m_back_of_fold_vertex_prog, *m_first_page,
-                                m_second_page != NULL, m_gradient_light_tid);
+    m_back_of_fold_vertexes.draw(m_back_of_fold_vertex_prog,
+                                 *m_pages[FIRST_PAGE],
+                                 m_pages[SECOND_PAGE] != NULL,
+                                 m_gradient_light_tid);
 
     // 2. draw unfold page and front of fold page
     glUseProgram(m_vertex_prog.program_ref());
     glActiveTexture(GL_TEXTURE0);
-    m_first_page->draw_front_page(m_vertex_prog, m_fold_front_vertexes);
-    if (m_second_page) {
-        m_second_page->draw_full_page(m_vertex_prog, true);
+    m_pages[FIRST_PAGE]->draw_front_page(m_vertex_prog, m_fold_front_vertexes);
+    if (m_pages[SECOND_PAGE]) {
+        m_pages[SECOND_PAGE]->draw_full_page(m_vertex_prog, true);
     }
 
     // 3. draw edge and base shadow of fold parts
@@ -561,11 +564,11 @@ void PageFlip::draw_page_frame()
     glActiveTexture(GL_TEXTURE0);
 
     // 1. draw first page
-    m_first_page->draw_full_page(m_vertex_prog, true);
+    m_pages[FIRST_PAGE]->draw_full_page(m_vertex_prog, true);
 
     // 2. draw second page if have
-    if (m_second_page) {
-        m_second_page->draw_full_page(m_vertex_prog, true);
+    if (m_pages[SECOND_PAGE]) {
+        m_pages[SECOND_PAGE]->draw_full_page(m_vertex_prog, true);
     }
 }
 
@@ -593,22 +596,32 @@ void PageFlip::compute_max_mesh_count()
 /**
  * Create gradient shadow texture for lighting effect
  */
-void PageFlip::create_gradient_light_texture()
+int PageFlip::set_gradient_light_texture(AndroidBitmapInfo& info, GLvoid* data)
 {
-    /*
-    int textureIDs[] = new int[1];
-    glGenTextures(1, textureIDs, 0);
+    GLint format;
+    GLenum type;
+    if (info.format == ANDROID_BITMAP_FORMAT_RGB_565) {
+        format = GL_RGB;
+        type = GL_UNSIGNED_SHORT_5_6_5;
+    }
+    else if (info.format == ANDROID_BITMAP_FORMAT_RGBA_8888) {
+        format = GL_RGBA;
+        type = GL_UNSIGNED_BYTE;
+    }
+    else {
+        return Error::ERR_UNSUPPORT_BITMAP_FORMAT;
+    }
+
+    glGenTextures(1, &m_gradient_light_tid);
     glActiveTexture(GL_TEXTURE0);
-    mGradientShadowTextureID = textureIDs[0];
 
     // gradient shadow texture
-    Bitmap shadow = PageFlipUtils.createGradientBitmap();
-    glBindTexture(GL_TEXTURE_2D, mGradientShadowTextureID);
+    glBindTexture(GL_TEXTURE_2D, m_gradient_light_tid);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    GLUtils.texImage2D(GL_TEXTURE_2D, 0, shadow, 0);
-    shadow.recycle();
-     */
+    glTexImage2D(GL_TEXTURE_2D, 0, format, info.width, info.height, 0, format,
+                 type, data);
+    return Error::OK;
 }
 
 /**
@@ -631,9 +644,9 @@ void PageFlip::compute_vertexes_build_page()
  */
 void PageFlip::compute_key_vertexes_when_vertical()
 {
-    const float o_x = m_first_page->m_origin_p.x ;
-    const float o_y = m_first_page->m_origin_p.y;
-    const float d_y = m_first_page->m_diagonal_p.y;
+    const float o_x = m_pages[FIRST_PAGE]->m_origin_p.x ;
+    const float o_y = m_pages[FIRST_PAGE]->m_origin_p.y;
+    const float d_y = m_pages[FIRST_PAGE]->m_diagonal_p.y;
 
     m_touch_p.y = o_y;
     m_middle_p.y = o_y;
@@ -666,7 +679,7 @@ void PageFlip::compute_vertexes_when_vertical()
     float x = m_middle_p.x;
     const float step_x = (m_middle_p.x - m_x_fold_p0.x) / m_mesh_count;
 
-    Page& page = *m_first_page;
+    Page& page = *m_pages[FIRST_PAGE];
     const float o_y = page.m_origin_p.y;
     const float d_y = page.m_diagonal_p.y;
     const float d_ty = page.m_diagonal_p.tex_y;
@@ -713,7 +726,7 @@ void PageFlip::compute_vertexes_when_vertical()
 
     // fold front
     m_fold_front_vertexes.reset();
-    page.build_vertexes_of_page_when_veritcal(m_fold_front_vertexes,
+    page.build_vertexes_of_page_when_vertical(m_fold_front_vertexes,
                                               m_x_fold_p1);
 }
 
@@ -722,8 +735,8 @@ void PageFlip::compute_vertexes_when_vertical()
  */
 void PageFlip::compute_key_vertexes_when_slope()
 {
-    const float o_x = m_first_page->m_origin_p.x;
-    const float o_y = m_first_page->m_origin_p.y;
+    const float o_x = m_pages[FIRST_PAGE]->m_origin_p.x;
+    const float o_y = m_pages[FIRST_PAGE]->m_origin_p.y;
 
     const float dx = m_middle_p.x - o_x;
     const float dy = m_middle_p.y - o_y;
@@ -1019,7 +1032,7 @@ void PageFlip::compute_base_shadow_last_vertex(float x0, float y0, float xfs,
  */
 void PageFlip::compute_vertexes_when_slope()
 {
-    Page& page = *m_first_page;
+    Page& page = *m_pages[FIRST_PAGE];
     const float o_x = page.m_origin_p.x;
     const float o_y = page.m_origin_p.y;
     const float d_y = page.m_diagonal_p.y;

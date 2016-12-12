@@ -25,29 +25,30 @@ class VertexProgram : public GLProgram {
 
 public:
     VertexProgram();
-
     ~VertexProgram();
 
     void clean();
-
-    virtual void init();
-
+    virtual int init();
     void init_matrix(float left, float right, float bottom, float top);
 
     // inline
-    inline GLint mvp_matrix_loc() {
+    inline GLint mvp_matrix_loc()
+    {
         return m_mvp_matrix_loc;
     }
 
-    inline GLint vertex_pos_loc() {
+    inline GLint vertex_pos_loc()
+    {
         return m_vertex_pos_loc;
     }
 
-    inline GLint tex_coord_loc() {
+    inline GLint tex_coord_loc()
+    {
         return m_tex_coord_loc;
     }
 
-    inline GLint texture_loc() {
+    inline GLint texture_loc()
+    {
         return m_texture_loc;
     }
 
@@ -59,11 +60,6 @@ public:
     static float mvp_matrix[16];
 
 protected:
-    static const char *VAR_MVP_MATRIX = "u_MVPMatrix";
-    static const char *VAR_VERTEX_POS = "a_vexPosition";
-    static const char *VAR_TEXTURE_COORD = "a_texCoord";
-    static const char *VAR_TEXTURE = "u_texture";
-
     GLint m_mvp_matrix_loc;
     GLint m_vertex_pos_loc;
     GLint m_tex_coord_loc;

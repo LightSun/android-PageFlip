@@ -4,13 +4,15 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
+
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds it for you.
 # Gradle automatically packages shared libraries with your APK.
 
 add_library( # Sets the name of the library.
-             pageflip-lib
+             pageflip
 
              # Sets the library as a shared library.
              SHARED
@@ -32,6 +34,8 @@ add_library( # Sets the name of the library.
              src/main/cpp/page.cpp
              src/main/cpp/pageflip.cpp
              src/main/cpp/scroller.cpp
+             src/main/cpp/utility.cpp
+             src/main/cpp/pageflip_jni.cpp
              )
 
 # Searches for a specified prebuilt library and stores the path as a
@@ -45,15 +49,20 @@ find_library( # Sets the name of the path variable.
 
               # Specifies the name of the NDK library that
               # you want CMake to locate.
-              log )
+              log
+               )
 
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in the
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries( # Specifies the target library.
-                       pageflip-lib
+                       pageflip
 
                        # Links the target library to the log library
                        # included in the NDK.
-                       ${log-lib} )
+                       ${log-lib}
+                        android
+                        jnigraphics
+                        EGL
+                        GLESv2)

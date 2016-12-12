@@ -16,7 +16,9 @@
 
 #include <algorithm>
 #include <math.h>
+#include <android/bitmap.h>
 #include "page.h"
+#include "utility.h"
 
 using namespace std;
 
@@ -24,108 +26,106 @@ namespace eschao {
 
 static const size_t kSizeOf3Float = sizeof(float) * 3;
 
-void Textures::set_first_texture_with_second() {
-    if (is_used[FIRST_TEXTURE_ID]) {
-        unused_ids[unused_ids_size++] = used_ids[FIRST_TEXTURE_ID];
+void Textures::set_first_texture_with_second()
+{
+    if (m_is_used[FIRST_TEXTURE_ID]) {
+        m_unused_ids[m_unused_ids_size++] = m_used_ids[FIRST_TEXTURE_ID];
     }
 
     memcpy(mask_color[FIRST_TEXTURE_ID], mask_color[SECOND_TEXTURE_ID],
            kSizeOf3Float);
-    used_ids[FIRST_TEXTURE_ID] = used_ids[SECOND_TEXTURE_ID];
-    is_used[SECOND_TEXTURE_ID] = false;
+    m_used_ids[FIRST_TEXTURE_ID] = m_used_ids[SECOND_TEXTURE_ID];
+    m_is_used[SECOND_TEXTURE_ID] = false;
 }
 
-void Textures::set_second_texture_with_first() {
-    if (is_used[SECOND_TEXTURE_ID]) {
-        unused_ids[unused_ids_size++] = used_ids[SECOND_TEXTURE_ID];
+void Textures::set_second_texture_with_first()
+{
+    if (m_is_used[SECOND_TEXTURE_ID]) {
+        m_unused_ids[m_unused_ids_size++] = m_used_ids[SECOND_TEXTURE_ID];
     }
 
     memcpy(mask_color[SECOND_TEXTURE_ID], mask_color[FIRST_TEXTURE_ID],
            kSizeOf3Float);
-    used_ids[SECOND_TEXTURE_ID] = used_ids[FIRST_TEXTURE_ID];
-    is_used[FIRST_TEXTURE_ID] = false;
+    m_used_ids[SECOND_TEXTURE_ID] = m_used_ids[FIRST_TEXTURE_ID];
+    m_is_used[FIRST_TEXTURE_ID] = false;
 }
 
-void Textures::swap_textures_with(Textures &rhs) {
-    unused_ids[unused_ids_size++] = used_ids[SECOND_TEXTURE_ID];
-    used_ids[SECOND_TEXTURE_ID] = used_ids[FIRST_TEXTURE_ID];
+void Textures::swap_textures_with(Textures &rhs)
+{
+    m_unused_ids[m_unused_ids_size++] = m_used_ids[SECOND_TEXTURE_ID];
+    m_used_ids[SECOND_TEXTURE_ID] = m_used_ids[FIRST_TEXTURE_ID];
 
-    unused_ids[unused_ids_size++] = used_ids[BACK_TEXTURE_ID];
-    used_ids[BACK_TEXTURE_ID] = rhs.used_ids[FIRST_TEXTURE_ID];
+    m_unused_ids[m_unused_ids_size++] = m_used_ids[BACK_TEXTURE_ID];
+    m_used_ids[BACK_TEXTURE_ID] = rhs.m_used_ids[FIRST_TEXTURE_ID];
 
-    used_ids[FIRST_TEXTURE_ID] = rhs.used_ids[BACK_TEXTURE_ID];
-    rhs.is_used[BACK_TEXTURE_ID] = false;
+    m_used_ids[FIRST_TEXTURE_ID] = rhs.m_used_ids[BACK_TEXTURE_ID];
+    rhs.m_is_used[BACK_TEXTURE_ID] = false;
 
-    rhs.used_ids[FIRST_TEXTURE_ID] = rhs.used_ids[SECOND_TEXTURE_ID];
-    rhs.is_used[SECOND_TEXTURE_ID] = false;
+    rhs.m_used_ids[FIRST_TEXTURE_ID] = rhs.m_used_ids[SECOND_TEXTURE_ID];
+    rhs.m_is_used[SECOND_TEXTURE_ID] = false;
 }
 
-void Textures::set_first_texture(jobject bitmap) {
-    /*
-    int color = PageFlipUtils.computeAverageColor(b, 30);
-    maskColor[FIRST_TEXTURE_ID][0] = Color.red(color) / 255.0f;
-    maskColor[FIRST_TEXTURE_ID][1] = Color.green(color) / 255.0f;
-    maskColor[FIRST_TEXTURE_ID][2] = Color.blue(color) / 255.0f;
+int Textures::set_texture(int index, AndroidBitmapInfo& info, GLvoid* data)
+{
+    int color = compute_average_color(info, data, 30);
+    mask_color[index][0] = RED(color) / 255.0f;
+    mask_color[index][1] = GREEN(color) / 255.0f;
+    mask_color[index][2] = BLUE(color) / 255.0f;
 
-    glGenTextures(1, mTexIDs, FIRST_TEXTURE_ID);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, mTexIDs[FIRST_TEXTURE_ID]);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    GLUtils.texImage2D(GL_TEXTURE_2D, 0, b, 0);
-    */
-}
-
-void Textures::set_second_texture(jobject bitmap) {
-    /*
-    int color = PageFlipUtils.computeAverageColor(b, 30);
-    maskColor[SECOND_TEXTURE_ID][0] = Color.red(color) / 255.0f;
-    maskColor[SECOND_TEXTURE_ID][1] = Color.green(color) / 255.0f;
-    maskColor[SECOND_TEXTURE_ID][2] = Color.blue(color) / 255.0f;
-
-    glGenTextures(1, mTexIDs, SECOND_TEXTURE_ID);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, mTexIDs[SECOND_TEXTURE_ID]);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    GLUtils.texImage2D(GL_TEXTURE_2D, 0, b, 0);
-    */
-}
-
-void Textures::set_back_texture(jobject bitmap) {
-    /*
-    if (b == null) {
-        // back texture is same with the first texture
-        if (mTexIDs[BACK_TEXTURE_ID] != INVALID_TEXTURE_ID) {
-            mUnusedTexIDs[mUnusedTexSize++] = mTexIDs[BACK_TEXTURE_ID];
-        }
-        mTexIDs[BACK_TEXTURE_ID] = INVALID_TEXTURE_ID;
+    GLint format;
+    GLenum type;
+    if (info.format == ANDROID_BITMAP_FORMAT_RGB_565) {
+        format = GL_RGB;
+        type = GL_UNSIGNED_SHORT_5_6_5;
+    }
+    else if (info.format == ANDROID_BITMAP_FORMAT_RGBA_8888) {
+        format = GL_RGBA;
+        type = GL_UNSIGNED_BYTE;
     }
     else {
-        // compute mask color
-        int color = PageFlipUtils.computeAverageColor(b, 50);
-        maskColor[BACK_TEXTURE_ID][0] = Color.red(color) / 255.0f;
-        maskColor[BACK_TEXTURE_ID][1] = Color.green(color) / 255.0f;
-        maskColor[BACK_TEXTURE_ID][2] = Color.blue(color) / 255.0f;
-
-        glGenTextures(1, mTexIDs, BACK_TEXTURE_ID);
-        glBindTexture(GL_TEXTURE_2D, mTexIDs[BACK_TEXTURE_ID]);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        GLUtils.texImage2D(GL_TEXTURE_2D, 0, b, 0);
+        return Error::ERR_UNSUPPORT_BITMAP_FORMAT;
     }
-    */
+
+    GLuint id;
+    glGenTextures(1, &id);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, id);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, format, info.width, info.height, 0, format,
+                 type, data);
+    m_used_ids[index] = id;
+    m_is_used[index] = true;
+    return Error::OK;
 }
 
-Page::Page() {
+const int Page::m_page_apex_orders[][4] = {
+        {0, 1, 2, 3}, // for case A
+        {1, 0, 3, 2}, // for case B
+        {2, 3, 0, 1}, // for case C
+        {3, 2, 1, 0}, // for case D
+};
+
+const int Page::m_fold_vex_orders[][5] = {
+        {4, 3, 1, 2, 0}, // Case A
+        {3, 3, 2, 0, 1}, // Case B
+        {3, 2, 1, 3, 0}, // Case C
+        {2, 2, 3, 1, 0}, // Case D
+        {1, 0, 1, 3, 2}, // Case E
+};
+
+Page::Page()
+{
     init(0, 0, 0, 0);
 }
 
-Page::Page(float left, float right, float top, float bottom) {
+Page::Page(float left, float right, float top, float bottom)
+{
     init(left, right, top, bottom);
 }
 
-void Page::init(float left, float right, float top, float bottom) {
+void Page::init(float left, float right, float top, float bottom)
+{
     m_top = top;
     m_left = left;
     m_right = right;
@@ -139,9 +139,12 @@ void Page::init(float left, float right, float top, float bottom) {
 
     m_front_vertex_count = 0;
     m_apex_order_index = 0;
+
+    build_vertexes_of_full_page();
 }
 
-void Page::compute_index_of_apex_order() {
+void Page::compute_index_of_apex_order()
+{
     m_apex_order_index = 0;
     if (m_origin_p.x < m_right && m_origin_p.y < 0) {
         m_apex_order_index = 3;
@@ -156,7 +159,8 @@ void Page::compute_index_of_apex_order() {
     }
 }
 
-void Page::set_origin_diagonal_points(bool has_second_page, bool is_top_area) {
+void Page::set_origin_diagonal_points(bool has_second_page, bool is_top_area)
+{
     if (has_second_page && m_left < 0) {
         m_origin_p.x = m_left;
         m_diagonal_p.x = m_right;
@@ -183,30 +187,33 @@ void Page::set_origin_diagonal_points(bool has_second_page, bool is_top_area) {
     m_diagonal_p.tex_y = (m_top - m_diagonal_p.y) / m_tex_height;
 }
 
-void Page::invert_y_of_origin_p() {
+void Page::invert_y_of_origin_p()
+{
     swap(m_origin_p.y, m_diagonal_p.y);
     swap(m_origin_p.tex_y, m_diagonal_p.tex_y);
     compute_index_of_apex_order();
 }
 
-void Page::draw_front_page(VertexProgram &program, Vertexes &vertexes) {
+void Page::draw_front_page(VertexProgram &program, Vertexes &vertexes)
+{
     // 1. draw unfold part and curled part with the first texture
     glUniformMatrix4fv(program.mvp_matrix_loc(), 1, GL_FALSE,
                        VertexProgram::mvp_matrix);
-    glBindTexture(GL_TEXTURE_2D, textures.used_ids[FIRST_TEXTURE_ID]);
+    glBindTexture(GL_TEXTURE_2D, textures.m_used_ids[FIRST_TEXTURE_ID]);
     glUniform1i(program.texture_loc(), 0);
     vertexes.draw_with(GL_TRIANGLE_STRIP,
                        program.vertex_pos_loc(), program.tex_coord_loc(),
                        0, m_front_vertex_count);
 
     // 2. draw the second texture
-    glBindTexture(GL_TEXTURE_2D, textures.used_ids[SECOND_TEXTURE_ID]);
+    glBindTexture(GL_TEXTURE_2D, textures.m_used_ids[SECOND_TEXTURE_ID]);
     glUniform1i(program.texture_loc(), 0);
     glDrawArrays(GL_TRIANGLE_STRIP, m_front_vertex_count,
                  vertexes.count() - m_front_vertex_count);
 }
 
-void Page::draw_full_page(VertexProgram &program, GLuint texture_id) {
+void Page::draw_full_page(VertexProgram &program, GLuint texture_id)
+{
     glBindTexture(GL_TEXTURE_2D, texture_id);
     glUniform1i(program.texture_loc(), 0);
 
@@ -221,8 +228,9 @@ void Page::draw_full_page(VertexProgram &program, GLuint texture_id) {
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 }
 
-void Page::build_vertexes_of_page_when_veritcal(Vertexes &front_vertexes,
-                                                PointF &x_fold_p1) {
+void Page::build_vertexes_of_page_when_vertical(Vertexes &front_vertexes,
+                                                PointF &x_fold_p1)
+{
     // if xFoldX and yFoldY are both outside the page, use the last vertex
     // order to draw page
     int index = 4;
@@ -281,7 +289,8 @@ void Page::build_vertexes_of_page_when_veritcal(Vertexes &front_vertexes,
 void Page::build_vertexes_of_page_when_slope(Vertexes &front_vertexes,
                                              PointF &x_fold_p1,
                                              PointF &y_fold_p1,
-                                             float k_value) {
+                                             float k_value)
+{
     // compute xFoldX point
     float half_h = m_height * 0.5f;
     int index = 0;
@@ -312,8 +321,8 @@ void Page::build_vertexes_of_page_when_slope(Vertexes &front_vertexes,
     }
 
     // get apex order and fold vertex order
-    const int const *apex_order = m_page_apex_orders[m_apex_order_index];
-    const int const *vex_order = m_fold_vex_orders[index];
+    const int* const apex_order = m_page_apex_orders[m_apex_order_index];
+    const int* const vex_order = m_fold_vex_orders[index];
 
     // need to draw first texture, add xFoldX and yFoldY first. Remember
     // the adding order of vertex in float buffer is X point prior to Y
@@ -353,7 +362,8 @@ void Page::build_vertexes_of_page_when_slope(Vertexes &front_vertexes,
     }
 }
 
-void Page::build_vertexes_of_full_page() {
+void Page::build_vertexes_of_full_page()
+{
     int i = 0;
     int j = 0;
 

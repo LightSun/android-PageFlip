@@ -17,26 +17,76 @@
 #ifndef ANDROID_PAGEFLIP_ERROR_H
 #define ANDROID_PAGEFLIP_ERROR_H
 
+#include <iostream>
+
+using namespace std;
+
 namespace eschao {
 
-#define MAX_DESC_LENGTH 1023
+class Error {
+public:
+    Error();
 
-enum Error {
-    OK = 0,
-    ERROR,
-    ERR_NULL_PARAMETER,
-    ERR_INVALID_PARAMETER,
-    ERR_GL_COMPILE_SHADER,
-    ERR_GL_LINK_PROGRAM,
-    ERR_GL_CREATE_SHADER_REF,
-    ERR_GL_CREATE_PROGRAM_REF,
-    ERR_GL_ATTACH_SHADER,
-    ERR_GL_ATTACH_FRAGMENT,
+    void set_desc(const char* desc);
+    int check_gl_error(const char* desc = NULL);
+
+    inline void reset()
+    {
+        err_code = OK;
+        err_desc[0] = '\0';
+    }
+
+    inline int code() const
+    {
+        return err_code;
+    }
+
+    inline const char* desc() const
+    {
+        return err_desc;
+    }
+
+    inline const char* end_desc(int index)
+    {
+        if (index >= 0 && index <= MAX_ERR_DESC_LENGTH) {
+            err_desc[index] = '\0';
+        }
+
+        return err_desc;
+    }
+
+    inline int set(int code, const char* desc = NULL)
+    {
+        set_desc(desc);
+        return err_code = code;
+    }
+
+public:
+    static const int MAX_ERR_DESC_LENGTH            = 1023;
+    static const int OK                             = 0;
+    static const int ERROR                          = OK - 1;
+    static const int ERR_PAGE_FLIP_UNINIT           = OK - 2;
+    static const int ERR_NULL_PARAMETER             = OK - 3;
+    static const int ERR_INVALID_PARAMETER          = OK - 4;
+    static const int ERR_GL_ERROR                   = OK - 5;
+    static const int ERR_GL_COMPILE_SHADER          = OK - 6;
+    static const int ERR_GL_LINK_PROGRAM            = OK - 7;
+    static const int ERR_GL_CREATE_SHADER_REF       = OK - 8;
+    static const int ERR_GL_CREATE_PROGRAM_REF      = OK - 9;
+    static const int ERR_GL_ATTACH_SHADER           = OK - 10;
+    static const int ERR_GL_ATTACH_FRAGMENT         = OK - 11;
+    static const int ERR_UNSUPPORT_BITMAP_FORMAT    = OK - 12;
+    static const int ERR_GET_BITMAP_INFO            = OK - 13;
+    static const int ERR_GET_BITMAP_DATA            = OK - 14;
+    static const int ERR_NO_TWO_PAGES               = OK - 15;
+
+private:
+    int err_code;
+    char err_desc[MAX_ERR_DESC_LENGTH + 1];
+
 };
 
-extern char err_desc[MAX_DESC_LENGTH + 1];
-
-extern int check_err_desc_len(int lne);
+extern Error g_error;
 
 }
 #endif //ANDROID_PAGEFLIP_ERROR_H

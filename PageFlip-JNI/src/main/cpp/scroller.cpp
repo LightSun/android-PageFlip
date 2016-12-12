@@ -19,21 +19,25 @@
 namespace eschao {
 
 Scroller::Scroller()
-        : m_finished(true) {
+        : m_finished(true)
+{
     m_interpolator = new LinearInterpolator();
 }
 
 Scroller::Scroller(Interpolator *interpolator)
-        : m_finished(true), m_interpolator(interpolator) {
+        : m_finished(true), m_interpolator(interpolator)
+{
 }
 
-Scroller::~Scroller() {
+Scroller::~Scroller()
+{
     if (m_interpolator) {
         delete m_interpolator;
     }
 }
 
-bool Scroller::compute_scroll_offset() {
+bool Scroller::compute_scroll_offset()
+{
     if (m_finished) {
         return false;
     }
@@ -54,7 +58,8 @@ bool Scroller::compute_scroll_offset() {
 }
 
 void Scroller::start_scroll(float start_x, float start_y, float dx, float dy,
-                            int duration) {
+                            int duration)
+{
     m_finished = false;
     m_duration = duration;
     m_start_time = get_system_clock();

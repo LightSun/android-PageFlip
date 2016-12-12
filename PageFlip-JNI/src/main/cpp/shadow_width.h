@@ -18,7 +18,6 @@
 #define ANDROID_PAGEFLIP_SHADOWWIDTH_H
 
 #include "error.h"
-#include "pageflip_exception.h"
 
 namespace eschao {
 
@@ -27,22 +26,26 @@ class ShadowWidth {
 public:
     ShadowWidth() : m_min(0), m_max(0), m_ratio(0) { }
 
-    ShadowWidth(float min, float max, float ratio) {
+    ShadowWidth(float min, float max, float ratio)
+    {
         set(min, max, ratio);
     }
 
-    inline void set(float min, float max, float ratio) {
+    inline int set(float min, float max, float ratio)
+    {
         if (min < 0 || max < 0 || min > max ||
             ratio <= 0 || ratio > 1) {
-            throw PageFlipException(Error::ERR_INVALID_PARAMETER);
+            return g_error.set(Error::ERR_INVALID_PARAMETER);
         }
 
         this->m_min = min;
         this->m_max = max;
         this->m_ratio = ratio;
+        return Error::OK;
     }
 
-    inline float width(float r) {
+    inline float width(float r)
+    {
         float w = r * m_ratio;
         if (w < m_min) {
             return m_min;

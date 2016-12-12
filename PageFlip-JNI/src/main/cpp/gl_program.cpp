@@ -18,7 +18,6 @@
 #include "gl_program.h"
 #include "error.h"
 #include "constant.h"
-#include "pageflip_exception.h"
 
 using namespace std;
 
@@ -45,40 +44,38 @@ void GLProgram::clean()
     }
 }
 
-void GLProgram::init(const char *shader_glsl, const char *fragment_glsl)
+int GLProgram::init(const char* shader_glsl, const char* fragment_glsl)
 {
     if (shader_glsl == NULL || fragment_glsl == NULL) {
-        throw PageFlipException(Error::ERR_NULL_PARAMETER);
+        return g_error.set(Error::ERR_NULL_PARAMETER);
     }
 
-    m_shader.load(GL_VERTEX_SHADER, shader_glsl);
-    try {
-        m_fragment.load(GL_FRAGMENT_SHADER, fragment_glsl);
+    if (Error::OK != m_shader.load(GL_VERTEX_SHADER, shader_glsl)) {
+        return g_error.code();
     }
-    catch (PageFlipException& e){
-        m_shader.clean();
-        throw e;
+    if (Error::OK != m_fragment.load(GL_FRAGMENT_SHADER, fragment_glsl)) {
+        return g_error.code();
     }
 
     m_program_ref = glCreateProgram();
     if (m_program_ref == Constant::kGlInvalidRef) {
         m_shader.clean();
         m_fragment.clean();
-        throw PageFlipException(ERR_GL_CREATE_PROGRAM_REF);
+        return g_error.set(Error::ERR_GL_CREATE_PROGRAM_REF);
     }
 
     glAttachShader(m_program_ref, m_shader.shader_ref());
-    int error = check_gl_error("When attach m_shader(glAttachShader)");
+    int error = g_error.check_gl_error("When attach m_shader(glAttachShader)");
     if (error != Error::OK) {
         clean();
-        throw PageFlipException(Error::ERR_GL_ATTACH_SHADER);
+        return g_error.set(Error::ERR_GL_ATTACH_SHADER);
     }
 
     glAttachShader(m_program_ref, m_fragment.shader_ref());
-    error = check_gl_error("When attach m_fragment(glAttachShader");
+    error = g_error.check_gl_error("When attach m_fragment(glAttachShader");
     if (error != Error::OK) {
         clean();
-        throw PageFlipException(Error::ERR_GL_ATTACH_FRAGMENT);
+        return g_error.set(Error::ERR_GL_ATTACH_FRAGMENT);
     }
 
     glLinkProgram(m_program_ref);
@@ -86,25 +83,21 @@ void GLProgram::init(const char *shader_glsl, const char *fragment_glsl)
     glGetProgramiv(m_program_ref, GL_LINK_STATUS, &link_status);
 
     if (link_status != GL_TRUE) {
+        g_error.set(Error::ERR_GL_LINK_PROGRAM);
         GLint info_len = 0;
         glGetProgramiv(m_program_ref, GL_INFO_LOG_LENGTH, &info_len);
 
         if (info_len) {
-            info_len = check_err_desc_len(info_len);
-            glGetProgramInfoLog(m_program_ref, info_len, NULL, err_desc);
+            if (info_len > Error::MAX_ERR_DESC_LENGTH) {
+                info_len = Error::MAX_ERR_DESC_LENGTH;
+            }
+            glGetProgramInfoLog(m_program_ref, info_len, NULL,
+                                const_cast<char*>(g_error.desc()));
+            g_error.end_desc(info_len + 1);
         }
 
         clean();
-        throw PageFlipException(Error::ERR_GL_LINK_PROGRAM);
-    }
-}
-
-int GLProgram::check_gl_error(const char* desc)
-{
-    GLenum err;
-    while ((err = glGetError()) != GL_NO_ERROR) {
-        sprintf(err_desc, "%s, glGetError() return 0x%x", desc, err);
-        return Error::ERROR;
+        return g_error.code();
     }
 
     return Error::OK;

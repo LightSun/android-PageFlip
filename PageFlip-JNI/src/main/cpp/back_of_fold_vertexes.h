@@ -30,27 +30,29 @@ class BackOfFoldVertexes : public Vertexes {
 
 public:
     BackOfFoldVertexes();
-
     ~BackOfFoldVertexes();
 
     void draw(BackOfFoldVertexProgram &program, Page &page,
               bool has_second_page, GLuint gradient_light_id);
 
     //inline
-    inline void set(int mesh_count) {
+    inline void set(int mesh_count)
+    {
         Vertexes::set(mesh_count << 1, 4, true);
     }
 
-    inline int set_mask_alpha(int alpha) {
+    inline int set_mask_alpha(int alpha)
+    {
         if (alpha < 0 || alpha > 255) {
-            return Error::ERR_INVALID_PARAMETER;
+            return g_error.set(Error::ERR_INVALID_PARAMETER);
         }
 
         m_mask_alpha = alpha / 255.0f;
         return Error::OK;
     }
 
-    inline int set_mask_alpha(float alpha) {
+    inline int set_mask_alpha(float alpha)
+    {
         if (alpha < 0 || alpha > 255) {
             return Error::ERR_INVALID_PARAMETER;
         }
@@ -61,7 +63,6 @@ public:
 
 protected:
     float m_mask_alpha;
-
 };
 
 }

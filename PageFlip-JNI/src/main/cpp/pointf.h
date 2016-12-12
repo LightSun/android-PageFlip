@@ -27,7 +27,8 @@ struct PointF {
 
     PointF(float x, float y) : x(x), y(y) { }
 
-    inline void set(float x, float y) {
+    inline void set(float x, float y)
+    {
         this->x = x;
         this->y = y;
     }
