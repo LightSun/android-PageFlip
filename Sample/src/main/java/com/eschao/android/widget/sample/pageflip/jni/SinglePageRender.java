@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.eschao.android.widget.sample.pageflip;
+package com.eschao.android.widget.sample.pageflip.jni;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -22,11 +22,10 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Message;
-import android.widget.Toast;
 
-import com.eschao.android.widget.pageflip.Page;
 import com.eschao.android.widget.pageflip.PageFlip;
-import com.eschao.android.widget.pageflip.PageFlipState;
+import com.eschao.android.widget.pageflip.jni.PageFlipLib;
+import com.eschao.android.widget.sample.common.LoadBitmapTask;
 
 /**
  * Single page render
@@ -49,9 +48,8 @@ public class SinglePageRender extends PageRender {
      * Constructor
      * @see {@link #PageRender(Context, PageFlip, Handler, int)}
      */
-    public SinglePageRender(Context context, PageFlip pageFlip,
-                            Handler handler, int pageNo) {
-        super(context, pageFlip, handler, pageNo);
+    public SinglePageRender(Context context, Handler handler, int pageNo) {
+        super(context, handler, pageNo);
     }
 
     /**
@@ -59,38 +57,38 @@ public class SinglePageRender extends PageRender {
      */
     public void onDrawFrame() {
         // 1. delete unused textures
-        mPageFlip.deleteUnusedTextures();
-        Page page = mPageFlip.getFirstPage();
+        PageFlipLib.deleteUnusedTextures(true);
+        //Page page = PageFlipLib.getFirstPage();
 
         // 2. handle drawing command triggered from finger moving and animating
         if (mDrawCommand == DRAW_MOVING_FRAME ||
             mDrawCommand == DRAW_ANIMATING_FRAME) {
             // is m_forward flip
-            if (mPageFlip.getFlipState() == PageFlipState.FORWARD_FLIP) {
+            if (PageFlipLib.getFlipState() == PageFlipLib.FORWARD_FLIP) {
                 // check if second texture of first page is valid, if not,
                 // create new one
-                if (!page.isSecondTextureSet()) {
+                if (!PageFlipLib.isSecondTextureSet(true)) {
                     drawPage(mPageNo + 1);
-                    page.setSecondTexture(mBitmap);
+                    PageFlipLib.setSecondTexture(true, mBitmap);
                 }
             }
             // in m_backward flip, check first texture of first page is valid
-            else if (!page.isFirstTextureSet()) {
+            else if (!PageFlipLib.isFirstTextureSet(true)) {
                 drawPage(--mPageNo);
-                page.setFirstTexture(mBitmap);
+                PageFlipLib.setFirstTexture(true, mBitmap);
             }
 
             // draw frame for page flip
-            mPageFlip.drawFlipFrame();
+            PageFlipLib.drawFlipFrame();
         }
         // draw stationary page without flipping
         else if (mDrawCommand == DRAW_FULL_PAGE) {
-            if (!page.isFirstTextureSet()) {
+            if (!PageFlipLib.isFirstTextureSet(true)) {
                 drawPage(mPageNo);
-                page.setFirstTexture(mBitmap);
+                PageFlipLib.setFirstTexture(true, mBitmap);
             }
 
-            mPageFlip.drawPageFrame();
+            PageFlipLib.drawPageFrame();
         }
 
         // 3. send message to main thread to notify drawing is ended so that
@@ -121,9 +119,8 @@ public class SinglePageRender extends PageRender {
 
         // create bitmap and canvas for page
         //mBackgroundBitmap = background;
-        Page page = mPageFlip.getFirstPage();
-        mBitmap = Bitmap.createBitmap((int)page.width(), (int)page.height(),
-                                      Bitmap.Config.ARGB_8888);
+        //Page page = mPageFlip.getFirstPage();
+        mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         mCanvas.setBitmap(mBitmap);
         LoadBitmapTask.get(mContext).set(width, height, 1);
     }
@@ -139,7 +136,7 @@ public class SinglePageRender extends PageRender {
      */
     public boolean onEndedDrawing(int what) {
         if (what == DRAW_ANIMATING_FRAME) {
-            boolean isAnimating = mPageFlip.animating();
+            boolean isAnimating = PageFlipLib.animating();
             // continue animating
             if (isAnimating) {
                 mDrawCommand = DRAW_ANIMATING_FRAME;
@@ -147,15 +144,15 @@ public class SinglePageRender extends PageRender {
             }
             // animation is finished
             else {
-                final PageFlipState state = mPageFlip.getFlipState();
+                final int state = PageFlipLib.getFlipState();
                 // update page number for m_backward flip
-                if (state == PageFlipState.END_WITH_BACKWARD) {
+                if (state == PageFlipLib.END_WITH_BACKWARD) {
                     // don't do anything on page number since mPageNo is always
                     // represents the FIRST_TEXTURE no;
                 }
                 // update page number and switch textures for m_forward flip
-                else if (state == PageFlipState.END_WITH_FORWARD) {
-                    mPageFlip.getFirstPage().setFirstTextureWithSecond();
+                else if (state == PageFlipLib.END_WITH_FORWARD) {
+                    PageFlipLib.setFirstTextureWithSecond(true);
                     mPageNo++;
                 }
 
@@ -219,17 +216,6 @@ public class SinglePageRender extends PageRender {
      */
     public boolean canFlipForward() {
         return (mPageNo < MAX_PAGES);
-        /*
-        if (mPageNo >= MAX_PAGES) {
-            Toast.makeText(mContext,
-                           "This is the last page!",
-                           Toast.LENGTH_SHORT)
-                 .show();
-            return false;
-        }
-        else {
-            return true;
-        }*/
     }
 
     /**
@@ -239,16 +225,10 @@ public class SinglePageRender extends PageRender {
      */
     public boolean canFlipBackward() {
         if (mPageNo > 1) {
-            mPageFlip.getFirstPage().setSecondTextureWithFirst();
+            PageFlipLib.setSecondTextureWithFirst(true);
             return true;
         }
         else {
-            /*
-            Toast.makeText(mContext,
-                           "This is the first page!",
-                           Toast.LENGTH_SHORT)
-                 .show();
-                 */
             return false;
         }
     }

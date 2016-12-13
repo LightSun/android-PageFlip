@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.eschao.android.widget.sample.pageflip;
+package com.eschao.android.widget.sample.pageflip.jni;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.os.Handler;
 
-import com.eschao.android.widget.pageflip.OnPageFlipListener;
 import com.eschao.android.widget.pageflip.PageFlip;
+import com.eschao.android.widget.pageflip.jni.PageFlipLib;
+import com.eschao.android.widget.sample.common.IPageRender;
 
 /**
  * Abstract Page Render
@@ -29,10 +30,10 @@ import com.eschao.android.widget.pageflip.PageFlip;
  * @author eschao
  */
 
-public abstract class PageRender implements OnPageFlipListener {
+public abstract class PageRender implements IPageRender {
 
     public final static int MSG_ENDED_DRAWING_FRAME = 1;
-    private final static String TAG = "PageRender";
+    private final static String TAG = "PageRenderJNI";
 
     final static int DRAW_MOVING_FRAME = 0;
     final static int DRAW_ANIMATING_FRAME = 1;
@@ -47,16 +48,13 @@ public abstract class PageRender implements OnPageFlipListener {
     Bitmap mBackgroundBitmap;
     Context mContext;
     Handler mHandler;
-    PageFlip mPageFlip;
 
-    public PageRender(Context context, PageFlip pageFlip,
-                      Handler handler, int pageNo) {
+    public PageRender(Context context, Handler handler, int pageNo) {
         mContext = context;
-        mPageFlip = pageFlip;
         mPageNo = pageNo;
         mDrawCommand = DRAW_FULL_PAGE;
         mCanvas = new Canvas();
-        mPageFlip.setListener(this);
+        PageFlip.setListener(this);
         mHandler = handler;
     }
 
@@ -78,7 +76,7 @@ public abstract class PageRender implements OnPageFlipListener {
             mBitmap = null;
         }
 
-        mPageFlip.setListener(null);
+        PageFlipLib.setListener(null);
         mCanvas = null;
         mBackgroundBitmap = null;
     }
@@ -103,7 +101,7 @@ public abstract class PageRender implements OnPageFlipListener {
      * @return true if event is handled
      */
     public boolean onFingerUp(float x, float y) {
-        if (mPageFlip.animating()) {
+        if (PageFlipLib.animating()) {
             mDrawCommand = DRAW_ANIMATING_FRAME;
             return true;
         }
@@ -118,25 +116,4 @@ public abstract class PageRender implements OnPageFlipListener {
         return (int)(size * mContext.getResources().getDisplayMetrics()
                                     .scaledDensity);
     }
-
-    /**
-     * Render page frame
-     */
-    abstract void onDrawFrame();
-
-    /**
-     * Handle surface changing event
-     *
-     * @param width surface width
-     * @param height surface height
-     */
-    abstract void onSurfaceChanged(int width, int height);
-
-    /**
-     * Handle drawing ended event
-     *
-     * @param what draw command
-     * @return true if render is needed
-     */
-    abstract boolean onEndedDrawing(int what);
 }

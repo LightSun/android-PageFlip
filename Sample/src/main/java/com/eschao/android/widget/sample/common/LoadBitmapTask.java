@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.eschao.android.widget.sample.pageflip;
+package com.eschao.android.widget.sample.common;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -21,6 +21,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.util.Log;
+
+import com.eschao.android.widget.sample.pageflip.R;
 
 import java.util.LinkedList;
 import java.util.Random;

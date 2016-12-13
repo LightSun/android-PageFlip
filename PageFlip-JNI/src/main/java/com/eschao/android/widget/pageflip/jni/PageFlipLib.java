@@ -4,9 +4,22 @@ import android.graphics.Bitmap;
 
 public class PageFlipLib {
 
+    public static int BEGIN_FLIP        = 0;
+    public static int FORWARD_FLIP      = 1;
+    public static int BACKWARD_FLIP     = 2;
+    public static int RESTORE_FLIP      = 3;
+    public static int END_FLIP          = 4;
+    public static int END_WITH_FORWARD  = 5;
+    public static int END_WITH_BACKWARD = 6;
+    public static int END_WITH_RESTORE  = 7;
+
+    static {
+        System.loadLibrary("libpageflip");
+    }
+
     protected static OnPageFlipListener mListener = null;
 
-    public static void setPageFlipListener(OnPageFlipListener listener) {
+    public static void setListener(OnPageFlipListener listener) {
         mListener = listener;
     }
 
@@ -52,6 +65,10 @@ public class PageFlipLib {
     public static native int getPixelsOfMesh();
     public static native int getSurfaceWidth();
     public static native int getSurfaceHeight();
+    public static native int getPageWidth(boolean isFirstPage);
+    public static native int getPageHeight(boolean isFirstPage);
+    public static native int isLeftPage(boolean isFirstPage);
+    public static native int isRightPage(boolean isFirstPage);
     public static native int onSurfaceCreated();
     public static native int onSurfaceChanged(int width, int height);
 

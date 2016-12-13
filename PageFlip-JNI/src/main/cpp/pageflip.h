@@ -85,7 +85,7 @@ enum PageMode {
 };
 
 enum PageFlipState {
-    BEGIN_FLIP,
+    BEGIN_FLIP = 0,
     FORWARD_FLIP,
     BACKWARD_FLIP,
     RESTORE_FLIP,

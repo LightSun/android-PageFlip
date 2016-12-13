@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.eschao.android.widget.sample.pageflip;
+package com.eschao.android.widget.sample.pageflip.java;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -23,8 +23,6 @@ import android.os.Build;
 import android.os.Bundle;
 
 import android.preference.PreferenceManager;
-import android.text.Html;
-import android.text.method.LinkMovementMethod;
 import android.view.GestureDetector;
 
 import android.view.GestureDetector.OnGestureListener;
@@ -35,6 +33,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
+
+import com.eschao.android.widget.sample.common.Constants;
+import com.eschao.android.widget.sample.common.LoadBitmapTask;
+import com.eschao.android.widget.sample.pageflip.R;
 
 /**
  * Sample Activity

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.eschao.android.widget.sample.pageflip;
+package com.eschao.android.widget.sample.pageflip.java;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -22,97 +22,78 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Message;
-import android.widget.Toast;
 
 import com.eschao.android.widget.pageflip.Page;
 import com.eschao.android.widget.pageflip.PageFlip;
 import com.eschao.android.widget.pageflip.PageFlipState;
+import com.eschao.android.widget.sample.common.LoadBitmapTask;
 
 /**
- * Double pages render
+ * Single page render
  * <p>
- * Some key points here:
+ * Every page need 2 texture in single page mode:
  * <ul>
- *     <li>First page is which page user is clicking on or moving by finger
- *          Sometimes it is left page on screen, sometimes it is right page.
- *          Second page is leftover page against the first page
+ *     <li>First texture: current page content</li>
+ *     <li>Back texture: back of front content, it is same with first texture
  *     </li>
- *     <li>mPageNo is always the number of left page instead of first page</li>
- * </ul>
- * </p>
- * <p>
- * Every screen 'Page' contains 3 page contents, so it need 3 textures:
- * <ul>
- *     <li>First texture: first page content of this 'Page'</li>
- *     <li>Back texture: the second page content of this 'Page'</li>
- *     <li>Second texture: the third page content of this 'Page'</li>
+ *     <li>Second texture: m_next page content</li>
  * </ul>
  * </p>
  *
  * @author eschao
  */
 
-public class DoublePagesRender extends PageRender {
+public class SinglePageRender extends PageRender {
 
     /**
      * Constructor
      * @see {@link #PageRender(Context, PageFlip, Handler, int)}
      */
-    public DoublePagesRender(Context context, PageFlip pageFlip,
-                             Handler handler, int pageNo) {
+    public SinglePageRender(Context context, PageFlip pageFlip,
+                            Handler handler, int pageNo) {
         super(context, pageFlip, handler, pageNo);
     }
 
     /**
-     * Draw page frame
+     * Draw frame
      */
     public void onDrawFrame() {
-        // 1. delete unused textures to save memory
+        // 1. delete unused textures
         mPageFlip.deleteUnusedTextures();
+        Page page = mPageFlip.getFirstPage();
 
-        // 2. there are two pages for representing the whole screen, we need to
-        // draw them one by one
-        final Page first = mPageFlip.getFirstPage();
-        final Page second = mPageFlip.getSecondPage();
-
-        // 3. check if the first texture is valid for first page, if not,
-        // create it with relative content
-        if (!first.isFirstTextureSet()) {
-            drawPage(first.isLeftPage() ? mPageNo : mPageNo + 1);
-            first.setFirstTexture(mBitmap);
-        }
-
-        // 4. check if the first texture is valid for second page
-        if (!second.isFirstTextureSet()) {
-            drawPage(second.isLeftPage() ? mPageNo : mPageNo + 1);
-            second.setFirstTexture(mBitmap);
-        }
-
-        // 5. handle drawing command triggered from finger moving and animating
+        // 2. handle drawing command triggered from finger moving and animating
         if (mDrawCommand == DRAW_MOVING_FRAME ||
             mDrawCommand == DRAW_ANIMATING_FRAME) {
-            // before drawing, check if back texture of first page is valid
-            // Remember: the first page is always the fold page
-            if (!first.isBackTextureSet()) {
-                drawPage(first.isLeftPage() ? mPageNo - 1 : mPageNo + 2);
-                first.setBackTexture(mBitmap);
+            // is m_forward flip
+            if (mPageFlip.getFlipState() == PageFlipState.FORWARD_FLIP) {
+                // check if second texture of first page is valid, if not,
+                // create new one
+                if (!page.isSecondTextureSet()) {
+                    drawPage(mPageNo + 1);
+                    page.setSecondTexture(mBitmap);
+                }
             }
-
-            // check the second texture of first page is valid.
-            if (!first.isSecondTextureSet()) {
-                drawPage(first.isLeftPage() ? mPageNo - 2 : mPageNo + 3);
-                first.setSecondTexture(mBitmap);
+            // in m_backward flip, check first texture of first page is valid
+            else if (!page.isFirstTextureSet()) {
+                drawPage(--mPageNo);
+                page.setFirstTexture(mBitmap);
             }
 
             // draw frame for page flip
             mPageFlip.drawFlipFrame();
         }
         // draw stationary page without flipping
-        else if (mDrawCommand == DRAW_FULL_PAGE){
+        else if (mDrawCommand == DRAW_FULL_PAGE) {
+            if (!page.isFirstTextureSet()) {
+                drawPage(mPageNo);
+                page.setFirstTexture(mBitmap);
+            }
+
             mPageFlip.drawPageFrame();
         }
 
-        // 6. send message to main thread to notify drawing is ended so that
+        // 3. send message to main thread to notify drawing is ended so that
         // we can continue to calculate m_next animation frame if need.
         // Remember: the drawing operation is always in GL thread instead of
         // main thread
@@ -141,11 +122,10 @@ public class DoublePagesRender extends PageRender {
         // create bitmap and canvas for page
         //mBackgroundBitmap = background;
         Page page = mPageFlip.getFirstPage();
-        int pageW = (int)page.width();
-        int pageH = (int)page.height();
-        mBitmap = Bitmap.createBitmap(pageW, pageH, Bitmap.Config.ARGB_8888);
+        mBitmap = Bitmap.createBitmap((int)page.width(), (int)page.height(),
+                                      Bitmap.Config.ARGB_8888);
         mCanvas.setBitmap(mBitmap);
-        LoadBitmapTask.get(mContext).set(pageW, pageH, 2);
+        LoadBitmapTask.get(mContext).set(width, height, 1);
     }
 
     /**
@@ -167,23 +147,16 @@ public class DoublePagesRender extends PageRender {
             }
             // animation is finished
             else {
-                // should handle m_forward flip to update page number and exchange
-                // textures between first and second pages. Don'top have to handle
-                // m_backward flip since there is no such state happened in double
-                // page mode
-                if (mPageFlip.getFlipState() == PageFlipState.END_WITH_FORWARD)
-                {
-                    final Page first = mPageFlip.getFirstPage();
-                    final Page second = mPageFlip.getSecondPage();
-                    second.swapTexturesWithPage(first);
-
-                    // update page number for left page
-                    if (first.isLeftPage()) {
-                        mPageNo -= 2;
-                    }
-                    else {
-                        mPageNo += 2;
-                    }
+                final PageFlipState state = mPageFlip.getFlipState();
+                // update page number for m_backward flip
+                if (state == PageFlipState.END_WITH_BACKWARD) {
+                    // don't do anything on page number since mPageNo is always
+                    // represents the FIRST_TEXTURE no;
+                }
+                // update page number and switch textures for m_forward flip
+                else if (state == PageFlipState.END_WITH_FORWARD) {
+                    mPageFlip.getFirstPage().setFirstTextureWithSecond();
+                    mPageNo++;
                 }
 
                 mDrawCommand = DRAW_FULL_PAGE;
@@ -207,46 +180,30 @@ public class DoublePagesRender extends PageRender {
         // 1. draw background bitmap
         Bitmap background = LoadBitmapTask.get(mContext).getBitmap();
         Rect rect = new Rect(0, 0, width, height);
-        if (width > height) {
-            mCanvas.rotate(90);
-            mCanvas.drawBitmap(background, null, rect, p);
-            mCanvas.rotate(-90);
-        }
-        else {
-            mCanvas.drawBitmap(background, null, rect, p);
-        }
-
+        mCanvas.drawBitmap(background, null, rect, p);
         background.recycle();
         background = null;
 
         // 2. draw page number
-        int fontSize = (int)(80 * mContext.getResources().getDisplayMetrics()
-                                          .scaledDensity);
+        int fontSize = calcFontSize(80);
         p.setColor(Color.WHITE);
         p.setStrokeWidth(1);
         p.setAntiAlias(true);
         p.setShadowLayer(5.0f, 8.0f, 8.0f, Color.BLACK);
         p.setTextSize(fontSize);
-
         String text = String.valueOf(number);
-        if (number < 1) {
-            text = "Preface";
-        }
-        else if (number > MAX_PAGES) {
-            text = "End";
-        }
         float textWidth = p.measureText(text);
         float y = height - p.getTextSize() - 20;
         mCanvas.drawText(text, (width - textWidth) / 2, y, p);
 
-        if (number == 1) {
+        if (number <= 1) {
             String firstPage = "The First Page";
             p.setTextSize(calcFontSize(16));
             float w = p.measureText(firstPage);
             float h = p.getTextSize();
             mCanvas.drawText(firstPage, (width - w) / 2, y + 5 + h, p);
         }
-        else if (number == MAX_PAGES) {
+        else if (number >= MAX_PAGES) {
             String lastPage = "The Last Page";
             p.setTextSize(calcFontSize(16));
             float w = p.measureText(lastPage);
@@ -261,22 +218,38 @@ public class DoublePagesRender extends PageRender {
      * @return true if it can flip m_forward
      */
     public boolean canFlipForward() {
-        final Page page = mPageFlip.getFirstPage();
-        // current page is left page
-        if (page.isLeftPage()) {
-            return (mPageNo > 1);
+        return (mPageNo < MAX_PAGES);
+        /*
+        if (mPageNo >= MAX_PAGES) {
+            Toast.makeText(mContext,
+                           "This is the last page!",
+                           Toast.LENGTH_SHORT)
+                 .show();
+            return false;
         }
-
-        // current page is right page
-        return (mPageNo + 2 <= MAX_PAGES);
+        else {
+            return true;
+        }*/
     }
 
     /**
-     * Don'top need to handle m_backward flip
+     * If page can flip m_backward
      *
-     * @return always false
+     * @return true if it can flip m_backward
      */
     public boolean canFlipBackward() {
-        return false;
+        if (mPageNo > 1) {
+            mPageFlip.getFirstPage().setSecondTextureWithFirst();
+            return true;
+        }
+        else {
+            /*
+            Toast.makeText(mContext,
+                           "This is the first page!",
+                           Toast.LENGTH_SHORT)
+                 .show();
+                 */
+            return false;
+        }
     }
 }

@@ -1,4 +1,4 @@
-package com.eschao.android.widget.sample.pageflip;
+package com.eschao.android.widget.sample.common;
 
 /**
  * Created by chao on 20/11/2016.
