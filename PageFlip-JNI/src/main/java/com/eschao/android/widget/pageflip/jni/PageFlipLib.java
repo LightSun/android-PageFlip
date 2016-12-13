@@ -67,8 +67,8 @@ public class PageFlipLib {
     public static native int getSurfaceHeight();
     public static native int getPageWidth(boolean isFirstPage);
     public static native int getPageHeight(boolean isFirstPage);
-    public static native int isLeftPage(boolean isFirstPage);
-    public static native int isRightPage(boolean isFirstPage);
+    public static native boolean isLeftPage(boolean isFirstPage);
+    public static native boolean isRightPage(boolean isFirstPage);
     public static native int onSurfaceCreated();
     public static native int onSurfaceChanged(int width, int height);
 

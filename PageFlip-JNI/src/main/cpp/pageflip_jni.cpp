@@ -345,6 +345,62 @@ JNIEXPORT jint JNICALL jni_get_surface_height(JNIEnv* env)
     return g_error.set(Error::ERR_PAGE_FLIP_UNINIT);
 }
 
+JNIEXPORT jint JNICALL jni_get_page_width(JNIEnv* env, jboolean is_first_page)
+{
+    g_error.reset();
+    if (g_pageflip) {
+        return (jint)g_pageflip->page_width(is_first_page);
+    }
+    else {
+        LOGE("jni_get_page_width",
+             "PageFlip object is null, please call init() first!");
+    }
+
+    return g_error.set(Error::ERR_PAGE_FLIP_UNINIT);
+}
+
+JNIEXPORT jint JNICALL jni_get_page_height(JNIEnv* env, jboolean is_first_page)
+{
+    g_error.reset();
+    if (g_pageflip) {
+        return (jint)g_pageflip->page_height(is_first_page);
+    }
+    else {
+        LOGE("jni_get_page_height",
+             "PageFlip object is null, please call init() first!");
+    }
+
+    return g_error.set(Error::ERR_PAGE_FLIP_UNINIT);
+}
+
+JNIEXPORT jboolean JNICALL jni_is_left_page(boolean is_first_page)
+{
+    g_error.reset();
+    if (g_pageflip) {
+        return g_pageflip->is_left_page(is_first_page);
+    }
+    else {
+        LOGE("jni_is_left_page",
+             "PageFlip object is null, please call init() first!");
+    }
+
+    return g_error.set(Error::ERR_PAGE_FLIP_UNINIT);
+}
+
+JNIEXPORT jboolean JNICALL jni_is_right_page(boolean is_first_page)
+{
+    g_error.reset();
+    if (g_pageflip) {
+        return g_pageflip->is_right_page(is_right_page);
+    }
+    else {
+        LOGE("jni_is_right_page",
+             "PageFlip object is null, please call init() first!");
+    }
+
+    return g_error.set(Error::ERR_PAGE_FLIP_UNINIT);
+} 
+
 JNIEXPORT jint JNICALL jni_on_surface_created(JNIEnv* env)
 {
     g_error.reset();
