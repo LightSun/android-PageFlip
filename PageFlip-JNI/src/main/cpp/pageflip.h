@@ -212,6 +212,10 @@ public:
         return m_pages[SECOND_PAGE] != NULL;
     }
 
+    inline bool is_texture_set(int texture_no, bool is_first_page) 
+    {
+    }
+
     inline bool is_first_texture_set(bool is_first_page)
     {
         return m_pages[is_first_page ? FIRST_PAGE : SECOND_PAGE]->textures

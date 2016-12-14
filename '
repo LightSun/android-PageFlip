@@ -10,11 +10,13 @@ public class PageFlipLib {
     };
 
     public static enum TextureNo {
-        FIRST_TEXTURE,
-        SECOND_TEXTURE,
-        BACK_TEXTURE;
+        FIRST_TEXTURE(0),
+        SECOND_TEXTURE(1),
+        BACK_TEXTURE(2);
     }
 
+    public static enum PageFlip {
+    }
     public static int BEGIN_FLIP        = 0;
     public static int FORWARD_FLIP      = 1;
     public static int BACKWARD_FLIP     = 2;
@@ -105,6 +107,7 @@ public class PageFlipLib {
 
     public static native int getFlipState();
     public static native boolean hasSecondPage();
+    public static native boolean isTextureOfPage1Set();
     public static native boolean isFirstTextureSet(boolean isFirstPage);
     public static native boolean isSecondTextureSet(boolean isFirstPage);
     public static native boolean isBackTextureSet(boolean isFirstPage);
@@ -116,6 +119,7 @@ public class PageFlipLib {
     public static native int setSecondTextureWithFirst(boolean isFirstPage);
     public static native int swapTexturesWith(boolean isFirstPage);
     public static native int deleteUnusedTextures(boolean isFirstPage);
+
     public static native boolean onFingerDown(float x, float y);
 
     private static native int getPageWidth(boolean isFirstPage);
@@ -124,7 +128,6 @@ public class PageFlipLib {
     private static native boolean isRightPage(boolean isFirstPage);
     private static native boolean isTextureSet(int textureNo, 
                                                boolean isFirstPage);
-    private static native int setTexture(int textureNo, boolean isFirstPage);
     private static native boolean onFingerMove(float x, float y,
                                                boolean canForward,
                                                boolean canBackward);

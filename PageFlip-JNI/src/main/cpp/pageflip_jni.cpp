@@ -359,6 +359,7 @@ JNIEXPORT jint JNICALL jni_get_page_width(JNIEnv* env, jboolean is_first_page)
     return g_error.set(Error::ERR_PAGE_FLIP_UNINIT);
 }
 
+
 JNIEXPORT jint JNICALL jni_get_page_height(JNIEnv* env, jboolean is_first_page)
 {
     g_error.reset();
@@ -366,14 +367,14 @@ JNIEXPORT jint JNICALL jni_get_page_height(JNIEnv* env, jboolean is_first_page)
         return (jint)g_pageflip->page_height(is_first_page);
     }
     else {
-        LOGE("jni_get_page_height",
+        LOGE("jni_get_height_of_page1",
              "PageFlip object is null, please call init() first!");
     }
 
     return g_error.set(Error::ERR_PAGE_FLIP_UNINIT);
 }
 
-JNIEXPORT jboolean JNICALL jni_is_left_page(boolean is_first_page)
+JNIEXPORT jboolean JNICALL jni_is_left_page(JNIEnv* env, jboolean is_first_page)
 {
     g_error.reset();
     if (g_pageflip) {
@@ -387,11 +388,12 @@ JNIEXPORT jboolean JNICALL jni_is_left_page(boolean is_first_page)
     return g_error.set(Error::ERR_PAGE_FLIP_UNINIT);
 }
 
-JNIEXPORT jboolean JNICALL jni_is_right_page(boolean is_first_page)
+JNIEXPORT jboolean JNICALL jni_is_right_page(JNIEnv* env, 
+                                             jboolean is_first_page)
 {
     g_error.reset();
     if (g_pageflip) {
-        return g_pageflip->is_right_page(is_right_page);
+        return g_pageflip->is_right_page(is_first_page);
     }
     else {
         LOGE("jni_is_right_page",
@@ -585,6 +587,23 @@ JNIEXPORT jboolean JNICALL jni_has_second_page(JNIEnv* env)
     else {
         g_error.set(Error::ERR_PAGE_FLIP_UNINIT);
         LOGE("jni_has_second_page",
+             "PageFlip object is null, please call init() first!");
+    }
+
+    return JNI_FALSE;
+}
+
+JNIEXPORT jboolean JNICALL jni_is_texture_set(JNIEnv* env, 
+                                              jint texture_no, 
+                                              jboolean is_first_page)
+{
+    g_error.reset();
+    if (g_pageflip) {
+        return (jboolean)g_pageflip->is_first_texture_set(is_first_page);
+    }
+    else {
+        g_error.set(Error::ERR_PAGE_FLIP_UNINIT);
+        LOGE("jni_is_first_texture_set",
              "PageFlip object is null, please call init() first!");
     }
 
